@@ -1,0 +1,1187 @@
+[
+  {
+    "ContainingType": "Carwash.API.Controllers.AsistenciaOperarioController",
+    "Method": "GetAll",
+    "RelativePath": "api/AsistenciaOperario",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.AsistenciaOperarioController",
+    "Method": "Delete",
+    "RelativePath": "api/AsistenciaOperario/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.AsistenciaOperarioController",
+    "Method": "Update",
+    "RelativePath": "api/AsistenciaOperario/ActualizarAsistenciaOperario/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "asistencia",
+        "Type": "Carwash.API.Modelos.AsistenciaOperario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.AsistenciaOperarioController",
+    "Method": "GetById",
+    "RelativePath": "api/AsistenciaOperario/GetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.AsistenciaOperarioController",
+    "Method": "Create",
+    "RelativePath": "api/AsistenciaOperario/RegistrarAsistenciaOperario",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "asistencia",
+        "Type": "Carwash.API.Modelos.AsistenciaOperario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Carwash.API.DTOs.LoginRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "GetAll",
+    "RelativePath": "api/CajaDiaria",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "GetById",
+    "RelativePath": "api/CajaDiaria/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "Delete",
+    "RelativePath": "api/CajaDiaria/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "Update",
+    "RelativePath": "api/CajaDiaria/ActualizarCajaDiaria/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "caja",
+        "Type": "Carwash.API.Modelos.CajaDiaria",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "CerrarCaja",
+    "RelativePath": "api/CajaDiaria/cerrar/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "CrearCaja",
+    "RelativePath": "api/CajaDiaria/CrearCaja",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "caja",
+        "Type": "Carwash.API.Modelos.CajaDiaria",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.CajaDiariaController",
+    "Method": "getCajaActiva",
+    "RelativePath": "api/CajaDiaria/getCajaActiva",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ClienteCreditoController",
+    "Method": "GetAll",
+    "RelativePath": "api/ClienteCredito",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ClienteCreditoController",
+    "Method": "GetById",
+    "RelativePath": "api/ClienteCredito/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ClienteCreditoController",
+    "Method": "getClienteCreditoActivos",
+    "RelativePath": "api/ClienteCredito/ClienteCreditoActivos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.FormaPagoController",
+    "Method": "GetAll",
+    "RelativePath": "api/FormaPago/GetAll",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.GastosCajaController",
+    "Method": "GetAll",
+    "RelativePath": "api/GastosCaja",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.GastosCajaController",
+    "Method": "GetById",
+    "RelativePath": "api/GastosCaja/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.GastosCajaController",
+    "Method": "Delete",
+    "RelativePath": "api/GastosCaja/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.GastosCajaController",
+    "Method": "ActualizarGastoCaja",
+    "RelativePath": "api/GastosCaja/ActualizarGastoCaja/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "gasto",
+        "Type": "Carwash.API.Modelos.GastosCaja",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.GastosCajaController",
+    "Method": "Create",
+    "RelativePath": "api/GastosCaja/RegistrarGastoCaja",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "gasto",
+        "Type": "Carwash.API.Modelos.GastosCaja",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "GetAll",
+    "RelativePath": "api/OperarioComisiones",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "Create",
+    "RelativePath": "api/OperarioComisiones",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "operarioComision",
+        "Type": "Carwash.API.Modelos.OperarioComisiones",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "Delete",
+    "RelativePath": "api/OperarioComisiones/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "Update",
+    "RelativePath": "api/OperarioComisiones/ActualizarOperarioComision/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "operarioComision",
+        "Type": "Carwash.API.Modelos.OperarioComisiones",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "GetById",
+    "RelativePath": "api/OperarioComisiones/BuscarPorDiaSemana",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "numeroDia",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "idOperario",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperarioComisionesController",
+    "Method": "ComisionbyOperario",
+    "RelativePath": "api/OperarioComisiones/ComisionbyOperario",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idOperario",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "GetAll",
+    "RelativePath": "api/Operarios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "Create",
+    "RelativePath": "api/Operarios",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "operario",
+        "Type": "Carwash.API.Modelos.Operarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "GetById",
+    "RelativePath": "api/Operarios/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "Delete",
+    "RelativePath": "api/Operarios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "Update",
+    "RelativePath": "api/Operarios/ActualizarOperario/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "operario",
+        "Type": "Carwash.API.Modelos.Operarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "getOperariosActivos",
+    "RelativePath": "api/Operarios/getOperariosActivos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.OperariosController",
+    "Method": "OperadoresDisponibles",
+    "RelativePath": "api/Operarios/OperadoresDisponibles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "GetAll",
+    "RelativePath": "api/RegistroPropinasOperarios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "Delete",
+    "RelativePath": "api/RegistroPropinasOperarios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "Update",
+    "RelativePath": "api/RegistroPropinasOperarios/ActualizarRegistroPropinasOperarios/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "registro",
+        "Type": "Carwash.API.Modelos.RegistroPropinasOperarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "GetallActivos",
+    "RelativePath": "api/RegistroPropinasOperarios/GetallActivos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "GetById",
+    "RelativePath": "api/RegistroPropinasOperarios/GetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.RegistroPropinasOperariosController",
+    "Method": "Create",
+    "RelativePath": "api/RegistroPropinasOperarios/RegistrarRegistroPropinasOperarios",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "registro",
+        "Type": "Carwash.API.Modelos.RegistroPropinasOperarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ServiciosController",
+    "Method": "GetListaCompletaServicios",
+    "RelativePath": "api/Servicios/GetListaCompletaServicios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ServiciosController",
+    "Method": "ServiciosPorTurno",
+    "RelativePath": "api/Servicios/ServiciosPorTurno",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TipoVehiculoController",
+    "Method": "GetAll",
+    "RelativePath": "api/TipoVehiculo/GetAll",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "GetAll",
+    "RelativePath": "api/Turnos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "Delete",
+    "RelativePath": "api/Turnos/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "Update",
+    "RelativePath": "api/Turnos/ActualizarTurno/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "turno",
+        "Type": "Carwash.API.Modelos.Turnos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "BuscarPorPlaca",
+    "RelativePath": "api/Turnos/BuscarPorPlaca",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "placa",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "DashboardOperadores",
+    "RelativePath": "api/Turnos/DashboardOperadores",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "GetallActivos",
+    "RelativePath": "api/Turnos/GetallActivos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "GetById",
+    "RelativePath": "api/Turnos/GetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "HistorialPorPlaca",
+    "RelativePath": "api/Turnos/HistorialPorPlaca",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "placa",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "PendientesNomina",
+    "RelativePath": "api/Turnos/PendientesNomina",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idOperario",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "fechaInicial",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "fechaFinal",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "Create",
+    "RelativePath": "api/Turnos/RegistrarTurno",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "turno",
+        "Type": "Carwash.API.Modelos.Turnos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "VehiculoEnProceso",
+    "RelativePath": "api/Turnos/VehiculoEnProceso",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "VehiculosEnProceso",
+    "RelativePath": "api/Turnos/VehiculosEnProceso",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "GetAll",
+    "RelativePath": "api/TurnosDiarios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "GetById",
+    "RelativePath": "api/TurnosDiarios/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "Delete",
+    "RelativePath": "api/TurnosDiarios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "ActualizarTurnoDiario",
+    "RelativePath": "api/TurnosDiarios/ActualizarTurnoDiario/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "turno",
+        "Type": "Carwash.API.Modelos.TurnosDiarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "GetByFecha",
+    "RelativePath": "api/TurnosDiarios/ByFecha",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fecha",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosDiariosController",
+    "Method": "Create",
+    "RelativePath": "api/TurnosDiarios/RegistrarTurnoDiario",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "turno",
+        "Type": "Carwash.API.Modelos.TurnosDiarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnoServiciosController",
+    "Method": "GetAll",
+    "RelativePath": "api/TurnoServicios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnoServiciosController",
+    "Method": "GetById",
+    "RelativePath": "api/TurnoServicios/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnoServiciosController",
+    "Method": "Update",
+    "RelativePath": "api/TurnoServicios/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "turnoServicio",
+        "Type": "Carwash.API.Modelos.TurnoServicios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnoServiciosController",
+    "Method": "Delete",
+    "RelativePath": "api/TurnoServicios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnoServiciosController",
+    "Method": "Create",
+    "RelativePath": "api/TurnoServicios/RegistrarTurnoServicio",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "turnoServicio",
+        "Type": "Carwash.API.Modelos.TurnoServicios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "GetAll",
+    "RelativePath": "api/TurnosMovimientos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "GetById",
+    "RelativePath": "api/TurnosMovimientos/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "Delete",
+    "RelativePath": "api/TurnosMovimientos/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "ActualizarTurnoMovimiento",
+    "RelativePath": "api/TurnosMovimientos/ActualizarTurnoMovimiento/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "turnoMovimiento",
+        "Type": "Carwash.API.Modelos.TurnosMovimientos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "GetHistoricoMovimientos",
+    "RelativePath": "api/TurnosMovimientos/GetHistoricoMovimientos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fechaInicial",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "fechaFinal",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "idFormaPago",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "idOperario",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosMovimientosController",
+    "Method": "Create",
+    "RelativePath": "api/TurnosMovimientos/RegistrarTurnoMovimiento",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "turnoMovimiento",
+        "Type": "Carwash.API.Modelos.TurnosMovimientos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ValesOperariosController",
+    "Method": "GetAll",
+    "RelativePath": "api/ValesOperarios/GetAll",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idCaja",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ValesOperariosController",
+    "Method": "GetById",
+    "RelativePath": "api/ValesOperarios/GetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.ValesOperariosController",
+    "Method": "Create",
+    "RelativePath": "api/ValesOperarios/RegistrarValesOperarios",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "valeOperario",
+        "Type": "Carwash.API.Modelos.ValesOperarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WeatherForecastController",
+    "Method": "Get",
+    "RelativePath": "WeatherForecast",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Carwash.API.WeatherForecast, Carwash.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "EndpointName": "GetWeatherForecast"
+  }
+]
