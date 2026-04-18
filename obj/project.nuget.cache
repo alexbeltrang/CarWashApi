@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iL+UwNeaiy4=",
+  "dgSpecHash": "F0f+zTkgtaw=",
   "success": true,
-  "projectFilePath": "D:\\WorkGitHub\\CarWash\\Carwash.API\\Carwash.API.csproj",
+  "projectFilePath": "D:\\WorkGitHub\\CarWashApi\\Carwash.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.data.sqlite.core\\9.0.14\\microsoft.data.sqlite.core.9.0.14.nupkg.sha512",
     "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.14\\microsoft.entityframeworkcore.9.0.14.nupkg.sha512",

@@ -1566,11 +1566,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\WorkGitHub\\CarWash\\Carwash.API\\Carwash.API.csproj",
+      "projectUniqueName": "D:\\WorkGitHub\\CarWashApi\\Carwash.API.csproj",
       "projectName": "Carwash.API",
-      "projectPath": "D:\\WorkGitHub\\CarWash\\Carwash.API\\Carwash.API.csproj",
+      "projectPath": "D:\\WorkGitHub\\CarWashApi\\Carwash.API.csproj",
       "packagesPath": "C:\\Users\\hbeltran\\.nuget\\packages\\",
-      "outputPath": "D:\\WorkGitHub\\CarWash\\Carwash.API\\obj\\",
+      "outputPath": "D:\\WorkGitHub\\CarWashApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
