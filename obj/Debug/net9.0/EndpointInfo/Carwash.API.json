@@ -330,6 +330,18 @@
         }
       }
     },
+    "/": {
+      "get": {
+        "tags": [
+          "Carwash.API"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/ClienteCredito": {
       "get": {
         "tags": [
@@ -2321,6 +2333,9 @@
     },
     {
       "name": "CajaDiaria"
+    },
+    {
+      "name": "Carwash.API"
     },
     {
       "name": "ClienteCredito"

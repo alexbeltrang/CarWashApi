@@ -105,7 +105,6 @@ D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\SQLitePCLRaw.provider.e_sqlite3.dll
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\System.Text.Json.dll
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\runtimes\browser-wasm\nativeassets\net9.0\e_sqlite3.a
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\runtimes\linux-arm\native\libe_sqlite3.so
 D:\WorkGitHub\CarWashApi\bin\Debug\net9.0\runtimes\linux-arm64\native\libe_sqlite3.so
@@ -145,10 +144,10 @@ D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\staticwebassets.development.json
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\staticwebassets.build.endpoints.json
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\swae.build.ex.cache
-D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\Carwash..40F6D38F.Up2Date
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\Carwash.API.dll
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\refint\Carwash.API.dll
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\Carwash.API.pdb
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\Carwash.API.genruntimeconfig.cache
 D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\ref\Carwash.API.dll
+D:\WorkGitHub\CarWashApi\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
