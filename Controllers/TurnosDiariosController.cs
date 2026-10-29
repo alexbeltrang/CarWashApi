@@ -83,14 +83,22 @@ namespace Carwash.API.Controllers
         }
 
         [HttpGet("ByFecha")]
-        public async Task<IActionResult> GetByFecha([FromQuery] string fecha)
+        public async Task<IActionResult> GetByFecha([FromQuery] string? fecha)
         {
             try
             {
-                if (!DateTime.TryParse(fecha, out DateTime fechaParsed))
+                var serverDate = DateTime.Now.Date;
+                Response.Headers["X-Server-Date"] = serverDate.ToString("yyyy-MM-dd");
+                var fechaParsed = string.IsNullOrWhiteSpace(fecha)
+                    ? serverDate
+                    : DateTime.TryParse(fecha, out var requestedDate)
+                        ? requestedDate
+                        : (DateTime?)null;
+
+                if (!fechaParsed.HasValue)
                     return BadRequest("Formato de fecha inválido");
 
-                var inicio = fechaParsed.Date;
+                var inicio = fechaParsed.Value.Date;
                 var fin = inicio.AddDays(1);
 
                 var data = await _context.TurnosDiarios
