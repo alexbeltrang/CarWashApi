@@ -376,3 +376,4 @@ C:\Work\CarWashApi\obj\Release\net9.0\win-x64\refint\Carwash.API.dll
 C:\Work\CarWashApi\obj\Release\net9.0\win-x64\Carwash.API.pdb
 C:\Work\CarWashApi\obj\Release\net9.0\win-x64\Carwash.API.genruntimeconfig.cache
 C:\Work\CarWashApi\obj\Release\net9.0\win-x64\ref\Carwash.API.dll
+C:\Work\CarWashApi\obj\Release\net9.0\win-x64\swae.build.ex.cache

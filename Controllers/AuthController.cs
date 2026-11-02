@@ -2,6 +2,7 @@ namespace Carwash.API.Controllers
 {
     using Carwash.API.Context;
     using Carwash.API.DTOs;
+    using Carwash.API.Services;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Carwash.API.Controllers
                 return Ok(new LoginResponseDto
                 {
                     EsValido = false,
-                    Respuesta = "Usuario y contraseña son requeridos"
+                    Respuesta = "Usuario y contraseï¿½a son requeridos"
                 });
             }
 
@@ -42,7 +43,7 @@ namespace Carwash.API.Controllers
                 return Ok(new LoginResponseDto
                 {
                     EsValido = false,
-                    Respuesta = "Usuario o contraseña incorrectos"
+                    Respuesta = "Usuario o contraseï¿½a incorrectos"
                 });
             }
 
@@ -55,7 +56,8 @@ namespace Carwash.API.Controllers
                     IdUser = usuario.IdUser,
                     DisplayName = usuario.DisplayName,
                     Email = usuario.Email,
-                    PerfilId = usuario.PerfilId
+                    PerfilId = usuario.PerfilId,
+                    EsAdministrador = await PerfilAdministrador.EsAdministradorAsync(_context, usuario.PerfilId)
                 }
             });
         }

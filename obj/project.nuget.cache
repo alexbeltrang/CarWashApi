@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "3mFIMBFKPJk=",
+  "dgSpecHash": "CYwyqpfTY8M=",
   "success": true,
   "projectFilePath": "C:\\Work\\CarWashApi\\Carwash.API.csproj",
   "expectedPackageFiles": [
@@ -35,7 +35,8 @@
     "C:\\Users\\alexb\\.nuget\\packages\\system.text.json\\9.0.14\\system.text.json.9.0.14.nupkg.sha512",
     "C:\\Users\\alexb\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\9.0.22\\microsoft.netcore.app.runtime.win-x64.9.0.22.nupkg.sha512",
     "C:\\Users\\alexb\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\9.0.22\\microsoft.windowsdesktop.app.runtime.win-x64.9.0.22.nupkg.sha512",
-    "C:\\Users\\alexb\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\9.0.22\\microsoft.aspnetcore.app.runtime.win-x64.9.0.22.nupkg.sha512"
+    "C:\\Users\\alexb\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\9.0.22\\microsoft.aspnetcore.app.runtime.win-x64.9.0.22.nupkg.sha512",
+    "C:\\Users\\alexb\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\9.0.22\\microsoft.netcore.app.crossgen2.win-x64.9.0.22.nupkg.sha512"
   ],
   "logs": []
 }

@@ -13,5 +13,6 @@ namespace Carwash.API.DTOs
         public string DisplayName { get; set; }
         public string Email { get; set; }
         public int PerfilId { get; set; }
+        public bool EsAdministrador { get; set; }
     }
 }

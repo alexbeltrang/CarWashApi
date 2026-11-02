@@ -1,6 +1,7 @@
 ﻿using Carwash.API.Context;
 using Carwash.API.DTOs;
 using Carwash.API.Modelos;
+using Carwash.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -73,8 +74,49 @@ namespace Carwash.API.Controllers
             if (id != turno.IdTurno)
                 return BadRequest();
 
+            var actual = await _context.Turnos.FindAsync(id);
+            if (actual == null)
+                return NotFound();
 
-            _context.Entry(turno).State = EntityState.Modified;
+            // Solo fusiona: un valor vacio o por defecto nunca borra un dato ya guardado.
+            static string? Texto(string? nuevo, string? actual) => string.IsNullOrWhiteSpace(nuevo) ? actual : nuevo;
+            static DateTime? Fecha(DateTime? nuevo, DateTime? actual) =>
+                nuevo.HasValue && nuevo.Value.Year > 1 ? nuevo : actual;
+            static decimal Monto(decimal nuevo, decimal actual) => nuevo != 0 ? nuevo : actual;
+            static int? Ref(int? nuevo, int? actual) => nuevo.HasValue && nuevo.Value > 0 ? nuevo : actual;
+
+            actual.NumeroTurno = Texto(turno.NumeroTurno, actual.NumeroTurno);
+            actual.NombreCliente = Texto(turno.NombreCliente, actual.NombreCliente);
+            actual.NumeroCelular = Texto(turno.NumeroCelular, actual.NumeroCelular);
+            actual.CorreoElectronico = Texto(turno.CorreoElectronico, actual.CorreoElectronico);
+            actual.Placa = Texto(turno.Placa, actual.Placa)!;
+            actual.Marca = Texto(turno.Marca, actual.Marca);
+            actual.NumeroOrden = Texto(turno.NumeroOrden, actual.NumeroOrden);
+            actual.Observaciones = Texto(turno.Observaciones, actual.Observaciones);
+
+            // La fecha de ingreso nunca se modifica una vez registrada.
+            if (actual.FechaHoraIngreso.Year <= 1)
+                actual.FechaHoraIngreso = turno.FechaHoraIngreso;
+            actual.FechaHoraFin = Fecha(turno.FechaHoraFin, actual.FechaHoraFin);
+            actual.FechaHoraAsignacionOperario = Fecha(turno.FechaHoraAsignacionOperario, actual.FechaHoraAsignacionOperario);
+
+            actual.Valor = Monto(turno.Valor, actual.Valor);
+            actual.ValorBaseComision = Monto(turno.ValorBaseComision, actual.ValorBaseComision);
+            actual.PorcentajeComision = Monto(turno.PorcentajeComision, actual.PorcentajeComision);
+            actual.ValorComision = Monto(turno.ValorComision, actual.ValorComision);
+
+            actual.idOperario = Ref(turno.idOperario, actual.idOperario);
+            actual.idCajaDiaria = Ref(turno.idCajaDiaria, actual.idCajaDiaria);
+            actual.idClienteCredito = Ref(turno.idClienteCredito, actual.idClienteCredito);
+            if (turno.IdTipoVehiculo > 0)
+                actual.IdTipoVehiculo = turno.IdTipoVehiculo;
+
+            // Las banderas de cierre solo avanzan; nunca se revierten.
+            actual.Pagado |= turno.Pagado;
+            actual.Estado |= turno.Estado;
+            actual.PagadoNomina |= turno.PagadoNomina;
+            if (turno.OperadorOcupado.HasValue)
+                actual.OperadorOcupado = turno.OperadorOcupado;
 
             await _context.SaveChangesAsync();
 
@@ -172,6 +214,57 @@ namespace Carwash.API.Controllers
             });
         }
 
+        [HttpPut("{id:int}/Operario")]
+        public async Task<IActionResult> AsignarOperario(int id, [FromBody] AsignarOperarioRequest request)
+        {
+            if (request == null || request.IdOperario <= 0 || request.IdUsuario <= 0)
+                return BadRequest("Datos de asignación inválidos");
+
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.IdUser == request.IdUsuario && !u.IsDelete);
+            var esAdministrador = usuario != null
+                && await PerfilAdministrador.EsAdministradorAsync(_context, usuario.PerfilId);
+            if (!esAdministrador)
+                return StatusCode(StatusCodes.Status403Forbidden, "Se requiere el perfil Administrador");
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var turno = await _context.Turnos.FindAsync(id);
+            if (turno == null)
+                return NotFound("Turno no encontrado");
+            if (turno.Estado)
+                return Conflict("El turno ya no está en proceso");
+
+            var operario = await _context.Operarios
+                .FirstOrDefaultAsync(o => o.idOperario == request.IdOperario && !o.isDelete);
+            if (operario == null)
+                return NotFound("Operario no encontrado");
+
+            if (turno.idOperario == request.IdOperario && turno.OperadorOcupado == true)
+                return NoContent();
+
+            var ocupado = await _context.Turnos.AnyAsync(t =>
+                t.IdTurno != id && t.idOperario == request.IdOperario && t.OperadorOcupado == true);
+            if (ocupado)
+                return Conflict("El operario está ocupado en otro turno");
+
+            // Misma regla que el WinForm: se requiere comisión válida para el día actual.
+            var diaSemana = (int)DateTime.Now.DayOfWeek;
+            var comision = await _context.OperarioComisiones
+                .FirstOrDefaultAsync(c => c.DiaSemana == diaSemana && c.idOperario == request.IdOperario);
+            if (comision == null || comision.Porcentaje <= 0)
+                return Conflict("El operario no tiene comisión válida para el día actual");
+
+            turno.idOperario = request.IdOperario;
+            turno.PorcentajeComision = comision.Porcentaje;
+            turno.FechaHoraAsignacionOperario = DateTime.Now;
+            turno.OperadorOcupado = true;
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+
         [HttpPut("{id:int}/EnProceso")]
         public async Task<IActionResult> ActualizarEnProceso(int id, [FromBody] ActualizarTurnoEnProcesoRequest request)
         {
@@ -243,7 +336,7 @@ namespace Carwash.API.Controllers
 
                         Marca = tur.Marca
                     }
-                ).ToListAsync();
+                ).Take(5).ToListAsync();
 
                 if (historial == null || historial.Count == 0)
                     return NotFound();
@@ -354,6 +447,7 @@ namespace Carwash.API.Controllers
 
                         tur.Valor,
                         tur.OperadorOcupado,
+                        tur.idOperario,
                         tur.Marca,
                         tur.NumeroOrden
                     }
@@ -370,7 +464,8 @@ namespace Carwash.API.Controllers
                     TipoVehiculo = x.TipoVehiculo,
                     OperadorAsignado = x.OperadorAsignado.Trim(),
                     ValorCliente = "$ " + x.Valor.ToString("N2"),
-                    OperadorOcupado = (bool)x.OperadorOcupado,
+                    OperadorOcupado = x.OperadorOcupado ?? false,
+                    idOperario = x.idOperario,
                     Marca = x.Marca,
                     NumeroOrden = x.NumeroOrden
                 }).ToList();

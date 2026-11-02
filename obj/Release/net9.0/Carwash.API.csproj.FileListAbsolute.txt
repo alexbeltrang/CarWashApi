@@ -80,3 +80,4 @@ C:\Work\CarWashApi\bin\Release\net9.0\publish\appsettings.json
 C:\Work\CarWashApi\bin\Release\net9.0\publish\Carwash.API.deps.json
 C:\Work\CarWashApi\bin\Release\net9.0\publish\Carwash.API.runtimeconfig.json
 C:\Work\CarWashApi\bin\Release\net9.0\publish\Carwash.API.staticwebassets.endpoints.json
+C:\Work\CarWashApi\obj\Release\net9.0\swae.build.ex.cache
