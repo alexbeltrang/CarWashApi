@@ -226,3 +226,10 @@ C:\Work\CarWashApi\obj\Debug\net9.0\Carwash.API.pdb
 C:\Work\CarWashApi\obj\Debug\net9.0\Carwash.API.genruntimeconfig.cache
 C:\Work\CarWashApi\obj\Debug\net9.0\ref\Carwash.API.dll
 C:\Work\CarWashApi\bin\Debug\net9.0\appsettings.example.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\web.config
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\appsettings.Development.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\appsettings.example.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\appsettings.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\Carwash.API.deps.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\Carwash.API.runtimeconfig.json
+C:\Work\CarWashApi\bin\Debug\net9.0\publish\Carwash.API.staticwebassets.endpoints.json

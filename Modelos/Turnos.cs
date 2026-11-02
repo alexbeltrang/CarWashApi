@@ -11,6 +11,7 @@ namespace Carwash.API.Modelos
         public string? NumeroTurno { get; set; }
         public string? NombreCliente { get; set; }
         public string? NumeroCelular { get; set; }
+        public string? CorreoElectronico { get; set; }
         public string Placa { get; set; }
         public DateTime FechaHoraIngreso { get; set; }
         public DateTime? FechaHoraFin { get; set; }

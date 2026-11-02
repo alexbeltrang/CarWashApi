@@ -13,8 +13,15 @@ public sealed class WhatsAppNotificationController(WhatsAppNotificationService s
         int idTurno,
         CancellationToken cancellationToken)
     {
-        var result = await service.NotifyAsync(idTurno, cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        try
+        {
+            var result = await service.NotifyAsync(idTurno, cancellationToken);
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (WhatsAppNotificationConflictException)
+        {
+            return Conflict();
+        }
     }
 
     [HttpPost("reintentar")]

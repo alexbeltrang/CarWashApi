@@ -1,5 +1,6 @@
 C:\inetpub\wwwroot\ApiCarWash\Carwash.API.exe
 C:\inetpub\wwwroot\ApiCarWash\appsettings.Development.json
+C:\inetpub\wwwroot\ApiCarWash\appsettings.example.json
 C:\inetpub\wwwroot\ApiCarWash\appsettings.json
 C:\inetpub\wwwroot\ApiCarWash\Carwash.API.dll
 C:\inetpub\wwwroot\ApiCarWash\Carwash.API.deps.json

@@ -7,6 +7,8 @@ using Carwash.API.Configuration;
 
 namespace Carwash.API.Services;
 
+public sealed class WhatsAppNotificationConflictException : Exception;
+
 public sealed class WhatsAppNotificationService(
     AppDbContext context,
     WhatsAppTemplateBuilder templateBuilder,
@@ -38,6 +40,8 @@ public sealed class WhatsAppNotificationService(
             where relation.IdTurno == idTurno && !relation.IsDeleted
             select new { service.Nombre, price.Precio }
         ).ToListAsync(cancellationToken);
+        if (services.Count == 0)
+            throw new WhatsAppNotificationConflictException();
 
         var notification = new WhatsAppNotification
         {

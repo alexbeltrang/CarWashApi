@@ -26,6 +26,7 @@
         public DbSet<RegistroPropinasOperarios> RegistroPropinasOperarios { get; set; }
         public DbSet<AsistenciaOperario> AsistenciaOperario { get; set; }
         public DbSet<WhatsAppNotification> WhatsAppNotifications { get; set; }
+        public DbSet<EmailNotification> EmailNotifications { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -55,6 +56,9 @@
 
             modelBuilder.Entity<FormaPago>().ToTable("FormaPago");
             modelBuilder.Entity<WhatsAppNotification>()
+                .HasIndex(notification => notification.IdTurno)
+                .IsUnique();
+            modelBuilder.Entity<EmailNotification>()
                 .HasIndex(notification => notification.IdTurno)
                 .IsUnique();
 

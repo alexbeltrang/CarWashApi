@@ -114,6 +114,7 @@ namespace Carwash.API.Controllers
                         t.IdTurno,
                         t.NombreCliente,
                         t.NumeroCelular,
+                        t.CorreoElectronico,
                         t.Placa,
                         t.IdTipoVehiculo,
                         t.Estado,
@@ -132,6 +133,80 @@ namespace Carwash.API.Controllers
             }
         }
 
+
+        [HttpGet("EnProcesoPorPlaca")]
+        public async Task<IActionResult> EnProcesoPorPlaca([FromQuery] string placa)
+        {
+            if (string.IsNullOrWhiteSpace(placa))
+                return BadRequest("La placa es obligatoria");
+
+            var placaNormalizada = placa.Trim().ToUpper();
+            var turno = await _context.Turnos
+                .Where(t => t.Placa.ToUpper() == placaNormalizada && t.Estado == false)
+                .OrderByDescending(t => t.FechaHoraIngreso)
+                .FirstOrDefaultAsync();
+
+            if (turno == null)
+                return NotFound();
+
+            var servicios = await _context.TurnoServicios
+                .Where(s => s.IdTurno == turno.IdTurno && !s.IsDeleted)
+                .Select(s => s.idServicios)
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(new TurnoEnProcesoDto
+            {
+                IdTurno = turno.IdTurno,
+                NumeroTurno = turno.NumeroTurno,
+                NombreCliente = turno.NombreCliente,
+                NumeroCelular = turno.NumeroCelular,
+                CorreoElectronico = turno.CorreoElectronico,
+                Placa = turno.Placa,
+                Marca = turno.Marca,
+                Observaciones = turno.Observaciones,
+                IdTipoVehiculo = turno.IdTipoVehiculo,
+                Valor = turno.Valor,
+                ValorBaseComision = turno.ValorBaseComision,
+                IdServicios = servicios,
+            });
+        }
+
+        [HttpPut("{id:int}/EnProceso")]
+        public async Task<IActionResult> ActualizarEnProceso(int id, [FromBody] ActualizarTurnoEnProcesoRequest request)
+        {
+            var servicios = request.IdServicios.Distinct().ToList();
+            if (servicios.Count == 0 || request.IdTipoVehiculo <= 0 || request.Valor < 0 || request.ValorBaseComision < 0)
+                return BadRequest("Datos del turno inválidos");
+
+            var turno = await _context.Turnos.FindAsync(id);
+            if (turno == null)
+                return NotFound();
+            if (turno.Estado)
+                return Conflict("El turno ya no está en proceso");
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            turno.NombreCliente = request.NombreCliente;
+            turno.NumeroCelular = request.NumeroCelular;
+            turno.CorreoElectronico = request.CorreoElectronico;
+            turno.Marca = request.Marca;
+            turno.Observaciones = request.Observaciones;
+            turno.IdTipoVehiculo = request.IdTipoVehiculo;
+            turno.Valor = request.Valor;
+            turno.ValorBaseComision = request.ValorBaseComision;
+
+            var existentes = await _context.TurnoServicios.Where(s => s.IdTurno == id).ToListAsync();
+            foreach (var relacion in existentes)
+                relacion.IsDeleted = !servicios.Contains(relacion.idServicios);
+
+            foreach (var idServicio in servicios.Where(s => existentes.All(e => e.idServicios != s)))
+                _context.TurnoServicios.Add(new TurnoServicios { idServicios = idServicio, IdTurno = id, IsDeleted = false });
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return NoContent();
+        }
 
         [HttpGet("HistorialPorPlaca")]
         public async Task<IActionResult> HistorialPorPlaca([FromQuery] string placa)
