@@ -8,8 +8,10 @@ idFormaPago, idOperario, placa completa e idTipoVehiculo opcionales por AND.
 Periodo por fecha del cobro, inclusivo en dias de la zona operativa. Resumen
 global (cantidad e importe decimal textual), detalle descendente por fecha/id,
 pageSize 50 por defecto (maximo 200) y nextCursor opaco ligado a criterios.
-GET /api/Reportes/Ventas/Filtros recibe solo fechas y devuelve opciones historicas,
-incluidas relaciones inactivas. No altera datos ni calcula desde servicios.
+GET /api/Reportes/Ventas/Filtros recibe solo fechas y devuelve catalogos completos
+independientes del periodo, sin operarios/tipos eliminados. FormaPago no tiene
+indicador de eliminacion. Los combos muestran nombres y envian IDs internamente;
+los cobros historicos permanecen consultables. No altera datos ni calcula desde servicios.
 Las paginas son vivas; no hay snapshot entre peticiones.
 
 Ambos GET y los GET raiz, {id} y GetHistoricoMovimientos de
@@ -26,8 +28,12 @@ POST /api/Auth/logout con Bearer canonico devuelve 204 incluso si ya no existe;
 sin credencial o malformada devuelve 401. Reiniciar proceso invalida sesiones.
 No guardar tokens/contrasenas en disco ni logs; clientes requieren reingreso.
 
-Configuracion opcional no secreta (seccion Session): IdleTimeoutMinutes=30,
-AbsoluteLifetimeHours=8, MaxSessions=10000. BusinessTimeZoneId usa zona local del
+Sesiones de 9 horas desde cada login, sin vencimiento por inactividad ni renovacion
+por uso. No se cierran otros usuarios. La app comparte su login general con Ventas
+y cierra toda la sesion al vencer. Configuracion no secreta (seccion Session):
+AbsoluteLifetimeHours=9, MaxSessions=10000. IdleTimeoutMinutes se conserva pero
+no controla vencimiento; idleTimeoutSeconds=32400 informa la duracion absoluta
+por compatibilidad. BusinessTimeZoneId usa zona local del
 servidor si se omite; identificador valido, sin migrar fechas locales existentes
 a UTC. X-Server-Date informa dia operativo en login/reporte. No activar
 SensitiveDataLogging ni registro de cuerpos/URLs con placas.

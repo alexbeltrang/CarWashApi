@@ -32,8 +32,8 @@ public sealed class ApiSessionStore : IDisposable
             if (sessions.Count >= options.MaxSessions) return null;
             var token = WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(32));
             var expires = now.AddHours(options.AbsoluteLifetimeHours);
-            sessions.Add(Hash(token), new SessionEntry(userId, now, expires));
-            return new IssuedSession(token, expires, checked(options.IdleTimeoutMinutes * 60));
+            sessions.Add(Hash(token), new SessionEntry(userId, expires));
+            return new IssuedSession(token, expires, checked(options.AbsoluteLifetimeHours * 3600));
         }
     }
 
@@ -50,7 +50,6 @@ public sealed class ApiSessionStore : IDisposable
                 sessions.Remove(hash);
                 return null;
             }
-            sessions[hash] = session with { LastSeen = now };
             return session.UserId;
         }
     }
@@ -74,7 +73,7 @@ public sealed class ApiSessionStore : IDisposable
     }
 
     private bool Expired(SessionEntry session, DateTimeOffset now) =>
-        now >= session.AbsoluteExpires || now - session.LastSeen >= TimeSpan.FromMinutes(options.IdleTimeoutMinutes);
+        now >= session.AbsoluteExpires;
 
     private void RemoveExpired()
     {
@@ -90,7 +89,7 @@ public sealed class ApiSessionStore : IDisposable
     private static string Hash(string token) => Convert.ToHexString(SHA256.HashData(System.Text.Encoding.ASCII.GetBytes(token)));
     public void Dispose() => cleanup.Dispose();
 
-    private sealed record SessionEntry(int UserId, DateTimeOffset LastSeen, DateTimeOffset AbsoluteExpires);
+    private sealed record SessionEntry(int UserId, DateTimeOffset AbsoluteExpires);
 }
 
 public sealed record IssuedSession(string AccessToken, DateTimeOffset ExpiresAt, int IdleTimeoutSeconds)

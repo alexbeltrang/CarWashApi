@@ -62,9 +62,9 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
             await using var registration = await database.Database.UseTransactionAsync(transaction, cancellationToken);
             var payments = await database.FormaPagos.AsNoTracking().Where(row => row.IdFormaPago > 0)
                 .Select(row => new { Id = row.IdFormaPago, Name = row.Nombre }).ToListAsync(cancellationToken);
-            var employees = await database.Operarios.AsNoTracking().Where(row => row.idOperario > 0)
+            var employees = await database.Operarios.AsNoTracking().Where(row => row.idOperario > 0 && !row.isDelete)
                 .Select(row => new { Id = row.idOperario, Name = ((row.Nombres ?? "") + " " + (row.Apellidos ?? "")).Trim() }).ToListAsync(cancellationToken);
-            var vehicles = await database.TipoVehiculo.AsNoTracking().Where(row => row.IdTipoVehiculo > 0)
+            var vehicles = await database.TipoVehiculo.AsNoTracking().Where(row => row.IdTipoVehiculo > 0 && !row.IsDelete)
                 .Select(row => new { Id = row.IdTipoVehiculo, Name = row.Nombre }).ToListAsync(cancellationToken);
             payments = payments.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
             employees = employees.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
