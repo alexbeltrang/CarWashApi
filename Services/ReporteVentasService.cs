@@ -28,6 +28,11 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
             await ValidateKeysAsync(query, cancellationToken);
             var count = await query.LongCountAsync(cancellationToken);
             var total = await query.Select(row => (decimal?)row.Amount).SumAsync(cancellationToken) ?? 0m;
+            var groups = await query.GroupBy(row => row.PaymentMethodId)
+                .Select(group => new { Id = group.Key, Name = group.Max(row => row.PaymentMethod), Count = group.Count(), Total = group.Sum(row => (decimal?)row.Amount) })
+                .ToListAsync(cancellationToken);
+            var summary = groups.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase)
+                .Select(row => new ReporteVentasResumenDto(row.Id, NameOrNull(row.Name), row.Count, (row.Total ?? 0m).ToString(CultureInfo.InvariantCulture))).ToArray();
             if (cursor != null)
                 query = query.Where(row => row.Date < cursor.Date || (row.Date == cursor.Date && row.Id < cursor.Id));
             var rows = await query.OrderByDescending(row => row.Date).ThenByDescending(row => row.Id)
@@ -43,7 +48,7 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
             var now = clock.GetUtcNow();
             await transaction.CommitAsync(cancellationToken);
             return new(request.Criterios, count, total.ToString(CultureInfo.InvariantCulture), items, next, request.PageSize,
-                now, DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime));
+                now, DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime), summary);
         }
         finally { await database.Database.CloseConnectionAsync(); }
     }
@@ -55,14 +60,15 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
         {
             await using var transaction = ((SqliteConnection)database.Database.GetDbConnection()).BeginTransaction(IsolationLevel.Serializable, deferred: true);
             await using var registration = await database.Database.UseTransactionAsync(transaction, cancellationToken);
-            var query = Filtered(criteria);
-            await ValidateKeysAsync(query, cancellationToken);
-            var payments = await query.Where(row => row.PaymentMethodId > 0)
-                .Select(row => new { Id = row.PaymentMethodId, Name = row.PaymentMethod }).Distinct().OrderBy(row => row.Id).ToListAsync(cancellationToken);
-            var employees = await query.Where(row => row.OperatorId.HasValue && row.OperatorId.Value > 0)
-                .Select(row => new { Id = row.OperatorId!.Value, Name = row.Operator }).Distinct().OrderBy(row => row.Id).ToListAsync(cancellationToken);
-            var vehicles = await query.Where(row => row.VehicleTypeId.HasValue && row.VehicleTypeId.Value > 0)
-                .Select(row => new { Id = row.VehicleTypeId!.Value, Name = row.VehicleType }).Distinct().OrderBy(row => row.Id).ToListAsync(cancellationToken);
+            var payments = await database.FormaPagos.AsNoTracking().Where(row => row.IdFormaPago > 0)
+                .Select(row => new { Id = row.IdFormaPago, Name = row.Nombre }).ToListAsync(cancellationToken);
+            var employees = await database.Operarios.AsNoTracking().Where(row => row.idOperario > 0)
+                .Select(row => new { Id = row.idOperario, Name = ((row.Nombres ?? "") + " " + (row.Apellidos ?? "")).Trim() }).ToListAsync(cancellationToken);
+            var vehicles = await database.TipoVehiculo.AsNoTracking().Where(row => row.IdTipoVehiculo > 0)
+                .Select(row => new { Id = row.IdTipoVehiculo, Name = row.Nombre }).ToListAsync(cancellationToken);
+            payments = payments.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+            employees = employees.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+            vehicles = vehicles.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
             await transaction.CommitAsync(cancellationToken);
             return new(criteria.FechaInicial, criteria.FechaFinal, GetBusinessDate(),
                 payments.Select(row => new ReporteFiltroDto(row.Id, NameOrNull(row.Name))).ToArray(),

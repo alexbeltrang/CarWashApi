@@ -63,7 +63,9 @@ public sealed record ReporteVentasMovimientoDto(
 public sealed record ReporteVentasDto(
     ReporteVentasCriteria Criterios, long CantidadCobros, string ImporteTotal,
     IReadOnlyList<ReporteVentasMovimientoDto> Items, string? NextCursor, int PageSize,
-    DateTimeOffset ConsultadoEn, DateOnly FechaOperativa);
+    DateTimeOffset ConsultadoEn, DateOnly FechaOperativa,
+    IReadOnlyList<ReporteVentasResumenDto>? Resumen = null);
+public sealed record ReporteVentasResumenDto(int IdFormaPago, string? FormaPago, long Cantidad, string Importe);
 
 public sealed record ReporteFiltroDto(int Id, string? Nombre);
 public sealed record ReporteVentasFiltrosDto(DateOnly FechaInicial, DateOnly FechaFinal, DateOnly FechaOperativa,
