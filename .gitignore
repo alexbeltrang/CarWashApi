@@ -1,1 +1,14 @@
 .vs/
+bin/
+obj/
+*.user
+*.suo
+packages/
+*.log
+.env*
+*.tmp
+*.swp
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

@@ -2,11 +2,27 @@
 using Carwash.API.Configuration;
 using Carwash.API.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddOptions<Carwash.API.Configuration.SessionOptions>()
+    .Bind(builder.Configuration.GetSection(Carwash.API.Configuration.SessionOptions.SectionName))
+    .Validate(options => options.IdleTimeoutMinutes is > 0 and <= 1440
+        && options.AbsoluteLifetimeHours is > 0 and <= 168 && options.MaxSessions is > 0 and <= 10000)
+    .ValidateOnStart();
+builder.Services.AddSingleton<ApiSessionStore>();
+builder.Services.AddAuthentication(SessionAuthenticationHandler.SchemeName)
+    .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(SessionAuthenticationHandler.SchemeName, _ => { });
+builder.Services.AddScoped<IAuthorizationHandler, AdministradorAuthorizationHandler>();
+builder.Services.AddAuthorization(options => options.AddPolicy(AdministradorAuthorizationHandler.PolicyName, policy =>
+    policy.AddAuthenticationSchemes(SessionAuthenticationHandler.SchemeName).RequireAuthenticatedUser()
+        .AddRequirements(new AdministradorRequirement())));
 builder.Services.AddOptions<WhatsAppOptions>()
     .Bind(builder.Configuration.GetSection(WhatsAppOptions.SectionName));
 builder.Services.AddOptions<EmailOptions>()
@@ -20,6 +36,7 @@ builder.Services.AddScoped<WhatsAppTemplateBuilder>();
 builder.Services.AddScoped<WhatsAppNotificationService>();
 builder.Services.AddScoped<EmailNotificationService>();
 builder.Services.AddScoped<IEmailClient, SmtpEmailClient>();
+builder.Services.AddScoped<ReporteVentasService>();
 
 // SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -86,8 +103,11 @@ app.UseSwaggerUI();
 // Redirigir raíz a Swagger
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

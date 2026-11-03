@@ -3,6 +3,8 @@ using Carwash.API.DTOs;
 using Carwash.API.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Carwash.API.Services;
 
 namespace Carwash.API.Controllers
 {
@@ -19,6 +21,7 @@ namespace Carwash.API.Controllers
 
         // GET: api/CajaDiaria
         [HttpGet]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
         public async Task<IActionResult> GetAll()
         {
             var data = await _context.TurnosMovimientos.ToListAsync();
@@ -27,6 +30,7 @@ namespace Carwash.API.Controllers
 
         // GET: api/Turnos/5
         [HttpGet("{id}")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
         public async Task<IActionResult> GetById(int id)
         {
             var turno = await _context.TurnosMovimientos.FindAsync(id);
@@ -85,6 +89,7 @@ namespace Carwash.API.Controllers
 
 
         [HttpGet("GetHistoricoMovimientos")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
         public async Task<IActionResult> GetHistoricoMovimientos(
             DateTime fechaInicial,
             DateTime fechaFinal,

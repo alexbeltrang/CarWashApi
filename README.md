@@ -1,5 +1,43 @@
 # CarWash API
 
+## Reporte de ventas y sesiones temporales
+
+Ventas representa cobros de TurnosMovimientos, incluidos parciales y Credito.
+GET /api/Reportes/Ventas requiere fechaInicial/fechaFinal en yyyy-MM-dd y acepta
+idFormaPago, idOperario, placa completa e idTipoVehiculo opcionales por AND.
+Periodo por fecha del cobro, inclusivo en dias de la zona operativa. Resumen
+global (cantidad e importe decimal textual), detalle descendente por fecha/id,
+pageSize 50 por defecto (maximo 200) y nextCursor opaco ligado a criterios.
+GET /api/Reportes/Ventas/Filtros recibe solo fechas y devuelve opciones historicas,
+incluidas relaciones inactivas. No altera datos ni calcula desde servicios.
+Las paginas son vivas; no hay snapshot entre peticiones.
+
+Ambos GET y los GET raiz, {id} y GetHistoricoMovimientos de
+/api/TurnosMovimientos requieren Bearer y Administrador actual en base.
+Ausente/invalido/vencido/revocado: 401 SESSION_REQUIRED; perfil sin permiso: 403
+ADMIN_REQUIRED. Datos invalidos: 400; fuente indisponible o esencial invalida:
+503; errores inesperados: 500. ProblemDetails seguro y Cache-Control: no-store.
+No cambian contratos/permisos de escrituras ni la fecha de ingreso del historico.
+
+POST /api/Auth/login conserva cifrado y respuesta previa; agrega accessToken,
+tokenType=Bearer, expiresAt e idleTimeoutSeconds a login valido. Credencial
+aleatoria, solo hash en memoria del servidor, sin JWT ni refresh token.
+POST /api/Auth/logout con Bearer canonico devuelve 204 incluso si ya no existe;
+sin credencial o malformada devuelve 401. Reiniciar proceso invalida sesiones.
+No guardar tokens/contrasenas en disco ni logs; clientes requieren reingreso.
+
+Configuracion opcional no secreta (seccion Session): IdleTimeoutMinutes=30,
+AbsoluteLifetimeHours=8, MaxSessions=10000. BusinessTimeZoneId usa zona local del
+servidor si se omite; identificador valido, sin migrar fechas locales existentes
+a UTC. X-Server-Date informa dia operativo en login/reporte. No activar
+SensitiveDataLogging ni registro de cuerpos/URLs con placas.
+
+Actualizar API, escritorio y APK coordinadamente: clientes anteriores reciben
+401 en historicos, sin excepciones por version. Probar primero en entorno aislado;
+la documentacion de Mobile contiene quickstart y gates reproducibles. HTTPS con
+certificado confiable recomendado; HTTP privado permite interceptar credenciales.
+No desactivar TLS ni exponer la API publicamente. Esto no es una auditoria global.
+
 ## Configuración de correo electrónico
 
 La API puede notificar la recepción de un vehículo usando SMTP. Las

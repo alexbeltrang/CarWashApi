@@ -1,7 +1,7 @@
 [
   {
     "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_1",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_2",
     "RelativePath": "",
     "HttpMethod": "GET",
     "IsController": false,
@@ -692,6 +692,204 @@
   },
   {
     "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "ActualizarEnProceso",
+    "RelativePath": "api/Turnos/{id}/EnProceso",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Carwash.API.DTOs.ActualizarTurnoEnProcesoRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "AsignarOperario",
+    "RelativePath": "api/Turnos/{id}/Operario",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Carwash.API.DTOs.AsignarOperarioRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.EmailNotificationController",
+    "Method": "Notify",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-email",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.EmailNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.EmailNotificationController",
+    "Method": "Get",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-email",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.EmailNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.EmailNotificationController",
+    "Method": "Retry",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-email/reintentar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.EmailNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WhatsAppNotificationController",
+    "Method": "Notify",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-whatsapp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.WhatsAppNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WhatsAppNotificationController",
+    "Method": "Get",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-whatsapp",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.WhatsAppNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WhatsAppNotificationController",
+    "Method": "Retry",
+    "RelativePath": "api/Turnos/{idTurno}/notificacion-whatsapp/reintentar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idTurno",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Carwash.API.DTOs.WhatsAppNotificationResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
     "Method": "Update",
     "RelativePath": "api/Turnos/ActualizarTurno/{id}",
     "HttpMethod": "PUT",
@@ -735,6 +933,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.TurnosController",
+    "Method": "EnProcesoPorPlaca",
+    "RelativePath": "api/Turnos/EnProcesoPorPlaca",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "placa",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -1174,6 +1388,48 @@
       {
         "Name": "valeOperario",
         "Type": "Carwash.API.Modelos.ValesOperarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WhatsAppWebhookController",
+    "Method": "Verify",
+    "RelativePath": "api/webhooks/whatsapp",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hub.mode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hub.verify_token",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hub.challenge",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Carwash.API.Controllers.WhatsAppWebhookController",
+    "Method": "Receive",
+    "RelativePath": "api/webhooks/whatsapp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "payload",
+        "Type": "Carwash.API.Controllers.WhatsAppWebhookPayload",
         "IsRequired": true
       }
     ],
