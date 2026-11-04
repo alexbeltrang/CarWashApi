@@ -78,6 +78,7 @@
           "warn": true,
           "downloadDependencies": [
             {
+<<<<<<< Updated upstream
               "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
               "version": "[9.0.22, 9.0.22]"
             },
@@ -91,6 +92,21 @@
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+=======
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.22, 9.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[9.0.22, 9.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.22, 9.0.22]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+>>>>>>> Stashed changes
               "version": "[9.0.22, 9.0.22]"
             }
           ],
@@ -103,11 +119,6 @@
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.403/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }
