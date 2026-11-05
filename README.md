@@ -46,6 +46,18 @@ No desactivar TLS ni exponer la API publicamente. Esto no es una auditoria globa
 
 ## Configuración de correo electrónico
 
+WhatsApp es un canal adicional e independiente del correo. La app actualizada
+solicita POST api/Turnos/{idTurno}/notificacion-whatsapp solo tras confirmar turno
+y servicios; GET consulta estado y POST reintentar no registra otro turno.
+WhatsApp:Enabled es false por defecto. Sin configuracion completa devuelve
+NOT_CONFIGURED sin llamar a Meta; no basta con instalar el APK para enviar.
+Configurar exclusivamente en servidor las claves WhatsApp del ejemplo, nunca
+tokens en Git o logs. AppSecret valida X-Hub-Signature-256 del webhook; el token
+WebhookVerifyToken solo verifica el challenge y no reemplaza esa firma.
+Guia de alta y plantilla: specs/004-confirmacion-whatsapp/quickstart.md en Mobile.
+No publicar toda la API en Internet para recibir webhooks: usar una entrada HTTPS
+restringida a /api/webhooks/whatsapp. Esta revision no despliega ni envia mensajes reales.
+
 La API puede notificar la recepción de un vehículo usando SMTP. Las
 credenciales deben configurarse únicamente en el servidor (por ejemplo, con
 variables de entorno o el almacén de secretos de IIS), nunca en el APK ni en

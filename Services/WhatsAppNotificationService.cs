@@ -4,6 +4,7 @@ using Carwash.API.Modelos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Carwash.API.Configuration;
+using Microsoft.Data.Sqlite;
 
 namespace Carwash.API.Services;
 
@@ -42,6 +43,8 @@ public sealed class WhatsAppNotificationService(
         ).ToListAsync(cancellationToken);
         if (services.Count == 0)
             throw new WhatsAppNotificationConflictException();
+        if (!options.Value.IsConfigured)
+            return new(idTurno, "NOT_CONFIGURED", "NONE");
 
         var notification = new WhatsAppNotification
         {
@@ -65,11 +68,22 @@ public sealed class WhatsAppNotificationService(
             notification.Estado = "NOT_APPLICABLE";
             notification.UltimoErrorCodigo = reason;
             notification.ActualizadoEn = DateTime.UtcNow;
-            await context.SaveChangesAsync(cancellationToken);
-            return ToResult(notification);
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException exception) when (exception.InnerException is SqliteException { SqliteErrorCode: 19 })
+        {
+            context.Entry(notification).State = EntityState.Detached;
+            var concurrent = await context.WhatsAppNotifications.AsNoTracking()
+                .SingleOrDefaultAsync(item => item.IdTurno == idTurno, cancellationToken);
+            if (concurrent is null) throw;
+            return ToResult(concurrent);
+        }
+        if (notification.Estado == "NOT_APPLICABLE")
+            return ToResult(notification);
         return await SendAsync(notification, recipient, templateName, language, parameters, cancellationToken);
     }
 
@@ -82,8 +96,10 @@ public sealed class WhatsAppNotificationService(
         if (notification is null)
             return await NotifyAsync(idTurno, cancellationToken);
         if (notification.MessageIdExterno is not null ||
-            notification.Estado is "ACCEPTED" or "DELIVERED" or "NOT_APPLICABLE")
+            notification.Estado is "ACCEPTED" or "DELIVERED" or "NOT_APPLICABLE" or "UNKNOWN" or "SENDING")
             return ToResult(notification);
+        if (!options.Value.IsConfigured)
+            return new(idTurno, "NOT_CONFIGURED", "NONE");
 
         var turn = await context.Turnos.SingleOrDefaultAsync(item => item.IdTurno == idTurno, cancellationToken);
         if (turn is null)
@@ -129,18 +145,41 @@ public sealed class WhatsAppNotificationService(
         IReadOnlyList<string> parameters,
         CancellationToken cancellationToken)
     {
-        notification.Intentos++;
-        notification.Estado = "RETRYING";
-        notification.ActualizadoEn = DateTime.UtcNow;
-        var result = await client.SendTemplateAsync(
-            recipient, templateName, language, parameters, cancellationToken);
+        var maximumAttempts = Math.Max(1, options.Value.MaxAttempts);
+        var claimed = await context.WhatsAppNotifications
+            .Where(item => item.Id == notification.Id && item.MessageIdExterno == null &&
+                item.Intentos < maximumAttempts &&
+                (item.Estado == "PENDING" || item.Estado == "RETRYING" || item.Estado == "FAILED"))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(item => item.Estado, "SENDING")
+                .SetProperty(item => item.Intentos, item => item.Intentos + 1)
+                .SetProperty(item => item.ActualizadoEn, DateTime.UtcNow), cancellationToken);
+        await context.Entry(notification).ReloadAsync(cancellationToken);
+        if (claimed == 0) return ToResult(notification);
+
+        WhatsAppSendResult result;
+        try
+        {
+            result = await client.SendTemplateAsync(
+                recipient, templateName, language, parameters, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            notification.Estado = "UNKNOWN";
+            notification.UltimoErrorCodigo = "CANCELLED";
+            notification.ProximoIntentoEn = null;
+            await context.SaveChangesAsync(CancellationToken.None);
+            throw;
+        }
 
         notification.MessageIdExterno = result.MessageId;
         notification.FbTraceId = result.FbTraceId;
         notification.UltimoErrorCodigo = result.ErrorCode;
         notification.Estado = result.Accepted
             ? "ACCEPTED"
-            : result.Transient && notification.Intentos < options.Value.MaxAttempts
+            : result.ErrorCode is "TIMEOUT" or "NETWORK" or "INVALID_RESPONSE"
+                ? "UNKNOWN"
+            : result.Transient && notification.Intentos < maximumAttempts
                 ? "RETRYING"
                 : "FAILED";
         notification.ProximoIntentoEn = notification.Estado == "RETRYING"
@@ -154,7 +193,9 @@ public sealed class WhatsAppNotificationService(
         return ToResult(notification);
     }
 
-    private static WhatsAppNotificationResult ToResult(WhatsAppNotification notification) =>
+    private WhatsAppNotificationResult ToResult(WhatsAppNotification notification) =>
         new(notification.IdTurno, notification.Estado,
-            notification.Estado is "FAILED" or "RETRYING" ? "RETRY_MANUAL" : "NONE");
+            notification.Estado is "FAILED" or "RETRYING" &&
+                notification.MessageIdExterno is null && notification.Intentos < Math.Max(1, options.Value.MaxAttempts)
+                ? "RETRY_MANUAL" : "NONE");
 }

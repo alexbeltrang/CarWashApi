@@ -1,6 +1,7 @@
 using Carwash.API.Configuration;
 using Carwash.API.Modelos;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace Carwash.API.Services;
 
@@ -32,16 +33,16 @@ public sealed class WhatsAppTemplateBuilder(IOptions<WhatsAppOptions> options)
         }
         if (services.Count == 0) { reason = "SERVICES_MISSING"; return false; }
 
+        var culture = CultureInfo.GetCultureInfo("es-CO");
         parameters = new[]
         {
             turn.NombreCliente?.Trim() ?? string.Empty,
             turn.Placa.Trim(),
             turn.Marca.Trim(),
-            string.Join(", ", services.Select(service => $"{service.Name}: {service.Price:N2}")),
-            turn.Valor.ToString("N2"),
+            string.Join(", ", services.Select(service => $"{service.Name}: {service.Price.ToString("N2", culture)}")),
+            turn.Valor.ToString("N2", culture),
             settings.CarWashName.Trim(),
         };
-        reason = "VEHICLE_COLOR_MISSING";
-        return false;
+        return true;
     }
 }

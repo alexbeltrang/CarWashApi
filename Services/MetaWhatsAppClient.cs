@@ -19,8 +19,7 @@ public sealed class MetaWhatsAppClient(
         CancellationToken cancellationToken)
     {
         var settings = options.Value;
-        if (string.IsNullOrWhiteSpace(settings.PhoneNumberId) ||
-            string.IsNullOrWhiteSpace(settings.AccessToken))
+        if (!settings.IsConfigured)
         {
             return new(false, false, null, null, "CONFIGURATION_MISSING");
         }
@@ -62,15 +61,23 @@ public sealed class MetaWhatsAppClient(
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             using var document = JsonDocument.Parse(body);
             var root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+                return new(false, false, null, null, "INVALID_RESPONSE");
             var traceId = root.TryGetProperty("fbtrace_id", out var trace) ? trace.GetString() : null;
 
             if (response.IsSuccessStatusCode &&
                 root.TryGetProperty("messages", out var messages) &&
+                messages.ValueKind == JsonValueKind.Array &&
                 messages.GetArrayLength() > 0 &&
-                messages[0].TryGetProperty("id", out var messageId))
+                messages[0].ValueKind == JsonValueKind.Object &&
+                messages[0].TryGetProperty("id", out var messageId) &&
+                messageId.ValueKind == JsonValueKind.String &&
+                !string.IsNullOrWhiteSpace(messageId.GetString()))
             {
                 return new(true, false, messageId.GetString(), traceId, null);
             }
+            if (response.IsSuccessStatusCode)
+                return new(false, false, null, traceId, "INVALID_RESPONSE");
 
             var error = root.TryGetProperty("error", out var errorElement)
                 ? errorElement

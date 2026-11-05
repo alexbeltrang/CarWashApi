@@ -1,6 +1,9 @@
 using Carwash.API.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace Carwash.API.Controllers;
 
@@ -27,10 +30,36 @@ public sealed class WhatsAppWebhookController(
     }
 
     [HttpPost]
+    [RequestSizeLimit(65536)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> Receive(
-        [FromBody] WhatsAppWebhookPayload payload,
         CancellationToken cancellationToken)
     {
+        var secret = configuration["WhatsApp:AppSecret"];
+        if (string.IsNullOrWhiteSpace(secret))
+            return Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Webhook no configurado.");
+        var signature = Request.Headers["X-Hub-Signature-256"].ToString();
+        if (!signature.StartsWith("sha256=", StringComparison.Ordinal) || signature.Length != 71)
+            return Unauthorized();
+        byte[] provided;
+        try { provided = Convert.FromHexString(signature[7..]); }
+        catch (FormatException) { return Unauthorized(); }
+        using var buffer = new MemoryStream();
+        await Request.Body.CopyToAsync(buffer, cancellationToken);
+        var body = buffer.ToArray();
+        var expected = HMACSHA256.HashData(Encoding.UTF8.GetBytes(secret), body);
+        if (!CryptographicOperations.FixedTimeEquals(expected, provided))
+            return Unauthorized();
+        WhatsAppWebhookPayload? payload;
+        try { payload = JsonSerializer.Deserialize<WhatsAppWebhookPayload>(body, new JsonSerializerOptions(JsonSerializerDefaults.Web)); }
+        catch (JsonException) { return BadRequest(); }
+        if (payload?.Entry is null) return BadRequest();
+        if (payload.Entry.Any(entry => entry is null || entry.Changes is null ||
+            entry.Changes.Any(change => change?.Value?.Statuses is null || change.Value.Statuses.Any(status => status is null))))
+            return BadRequest();
         foreach (var status in payload.Entry.SelectMany(entry => entry.Changes)
                      .SelectMany(change => change.Value.Statuses))
         {
@@ -41,8 +70,8 @@ public sealed class WhatsAppWebhookController(
 
             notification.Estado = status.Status switch
             {
-                "sent" or "read" => notification.Estado == "DELIVERED" ? "DELIVERED" : "ACCEPTED",
-                "delivered" => "DELIVERED",
+                "sent" => notification.Estado == "DELIVERED" ? "DELIVERED" : "ACCEPTED",
+                "delivered" or "read" => "DELIVERED",
                 _ => notification.Estado,
             };
             notification.ActualizadoEn = DateTime.UtcNow;
