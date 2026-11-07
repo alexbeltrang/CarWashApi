@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+    "SplashCar", "printing.json"), optional: true, reloadOnChange: false);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
 builder.Services.AddControllers();
@@ -35,6 +37,18 @@ builder.Services.AddHttpClient<IWhatsAppClient, MetaWhatsAppClient>(client =>
 builder.Services.AddScoped<WhatsAppTemplateBuilder>();
 builder.Services.AddScoped<WhatsAppNotificationService>();
 builder.Services.AddScoped<EmailNotificationService>();
+builder.Services.AddScoped<RetiroVehiculosService>();
+builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<FacturacionService>();
+builder.Services.AddScoped<IFacturacionService>(services => services.GetRequiredService<FacturacionService>());
+builder.Services.AddOptions<PrintingOptions>().Bind(builder.Configuration.GetSection("Printing"))
+    .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.PrinterName) && options.PrinterName.Length <= 256)
+    .ValidateOnStart();
+if (OperatingSystem.IsWindows()) builder.Services.AddSingleton<IReceiptPrinter, WindowsReceiptPrinter>();
+else builder.Services.AddSingleton<IReceiptPrinter, UnavailableReceiptPrinter>();
+builder.Services.AddScoped<ImpresionComprobantesService>();
+builder.Services.AddScoped<IImpresionComprobantesService>(services => services.GetRequiredService<ImpresionComprobantesService>());
+builder.Services.AddHostedService<ReceiptPrintWorker>();
 builder.Services.AddScoped<IEmailClient, SmtpEmailClient>();
 builder.Services.AddScoped<ReporteVentasService>();
 
@@ -81,6 +95,51 @@ using (var scope = app.Services.CreateScope())
         );
         CREATE UNIQUE INDEX IF NOT EXISTS IX_EmailNotifications_IdTurno
             ON EmailNotifications (IdTurno);
+        CREATE TABLE IF NOT EXISTS ComprobantesRetiro (
+            IdTurno INTEGER NOT NULL CONSTRAINT PK_ComprobantesRetiro PRIMARY KEY,
+            Codigo TEXT NOT NULL,
+            CreadoEn TEXT NOT NULL,
+            EntregadoEn TEXT NULL,
+            EntregadoPor INTEGER NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS IX_ComprobantesRetiro_Codigo
+            ON ComprobantesRetiro (Codigo);
+        CREATE TABLE IF NOT EXISTS ImpresionesComprobante (
+            SolicitudId TEXT NOT NULL CONSTRAINT PK_ImpresionesComprobante PRIMARY KEY,
+            IdTurno INTEGER NOT NULL,
+            AnchoMm INTEGER NOT NULL,
+            SolicitadoPor INTEGER NOT NULL,
+            Impresora TEXT NOT NULL,
+            Estado TEXT NOT NULL,
+            Texto TEXT NOT NULL,
+            CreadoEn TEXT NOT NULL,
+            ActualizadoEn TEXT NOT NULL,
+            ErrorCodigo TEXT NULL
+        );
+        CREATE INDEX IF NOT EXISTS IX_ImpresionesComprobante_IdTurno_CreadoEn
+            ON ImpresionesComprobante (IdTurno, CreadoEn);
+        CREATE TABLE IF NOT EXISTS Empresa (
+            Id INTEGER NOT NULL CONSTRAINT PK_Empresa PRIMARY KEY CHECK (Id = 1),
+            DatosJson TEXT NOT NULL,
+            Revision INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS ConfiguracionFacturacion (
+            Id INTEGER NOT NULL CONSTRAINT PK_ConfiguracionFacturacion PRIMARY KEY CHECK (Id = 1),
+            DatosJson TEXT NOT NULL,
+            Revision INTEGER NOT NULL,
+            SiguienteNumero INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS Facturas (
+            Id TEXT NOT NULL CONSTRAINT PK_Facturas PRIMARY KEY,
+            IdTurno INTEGER NOT NULL,
+            Prefijo TEXT NOT NULL,
+            Numero INTEGER NOT NULL,
+            Fecha TEXT NOT NULL,
+            Placa TEXT NOT NULL,
+            DatosJson TEXT NOT NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS IX_Facturas_IdTurno ON Facturas (IdTurno);
+        CREATE UNIQUE INDEX IF NOT EXISTS IX_Facturas_Prefijo_Numero ON Facturas (Prefijo, Numero);
         """);
     using var command = db.Database.GetDbConnection().CreateCommand();
     command.CommandText = "PRAGMA table_info(Turnos)";

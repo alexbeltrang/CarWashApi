@@ -10,7 +10,8 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "9.0.14",
           "Microsoft.EntityFrameworkCore.Sqlite": "9.0.14",
-          "Swashbuckle.AspNetCore": "10.1.7"
+          "Swashbuckle.AspNetCore": "10.1.7",
+          "System.Drawing.Common": "9.0.14"
         },
         "runtime": {
           "Carwash.API.dll": {}
@@ -206,6 +207,22 @@
           }
         }
       },
+      "Microsoft.Win32.SystemEvents/9.0.14": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Win32.SystemEvents.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1426.11910"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net9.0/Microsoft.Win32.SystemEvents.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1426.11910"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.10": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.10",
@@ -382,6 +399,21 @@
             "fileVersion": "10.1.7.2427"
           }
         }
+      },
+      "System.Drawing.Common/9.0.14": {
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "9.0.14"
+        },
+        "runtime": {
+          "lib/net9.0/System.Drawing.Common.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1426.11904"
+          },
+          "lib/net9.0/System.Private.Windows.Core.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1426.11904"
+          }
+        }
       }
     }
   },
@@ -510,6 +542,13 @@
       "path": "microsoft.openapi/2.4.1",
       "hashPath": "microsoft.openapi.2.4.1.nupkg.sha512"
     },
+    "Microsoft.Win32.SystemEvents/9.0.14": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o4DkqaN55rbDwojl0ktnAI/ZADDYucLqlFmhFx+n/IEZVU5Jskf74U2dp4ABJyiSH90VlorNncmvTzX1gBktOQ==",
+      "path": "microsoft.win32.systemevents/9.0.14",
+      "hashPath": "microsoft.win32.systemevents.9.0.14.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.10": {
       "type": "package",
       "serviceable": true,
@@ -565,6 +604,13 @@
       "sha512": "sha512-iJo3ODyUb/M8Vm8AH1r9y9iAba0w95xsCn3zFVl96ISRHbTDWxi+l7oFVCZqUEdjd97B8VMDPnMliWAdomR8uw==",
       "path": "swashbuckle.aspnetcore.swaggerui/10.1.7",
       "hashPath": "swashbuckle.aspnetcore.swaggerui.10.1.7.nupkg.sha512"
+    },
+    "System.Drawing.Common/9.0.14": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ecVymtwnnc5Qaz1KruQJAhcYbklYF+5wfKLRcbYaX53fCdIZb8NmXbiJlft6L7GNyw6Xv1z1KAB8Dwi7WagsYg==",
+      "path": "system.drawing.common/9.0.14",
+      "hashPath": "system.drawing.common.9.0.14.nupkg.sha512"
     }
   }
 }

@@ -64,6 +64,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[10.1.7, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[9.0.14, )"
             }
           },
           "imports": [

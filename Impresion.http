@@ -1,0 +1,19 @@
+@baseUrl = http://localhost:5197
+@token = REPLACE_LOCALLY_WITH_EXISTING_SESSION
+@idTurno = 10
+@solicitudId = 6b1f67d0-584a-4a95-88dd-c61c43d61fe5
+
+### Solo ejecutar solicitudes de impresion contra fixture aislada o ingreso real autorizado.
+POST {{baseUrl}}/api/RetiroVehiculos/{{idTurno}}/impresiones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"solicitudId":"{{solicitudId}}","anchoMm":80}
+
+### Consultar la misma solicitud sin imprimir de nuevo.
+GET {{baseUrl}}/api/RetiroVehiculos/impresiones/{{solicitudId}}
+Authorization: Bearer {{token}}
+
+### Recuperar ultima solicitud; 204 si no existe.
+GET {{baseUrl}}/api/RetiroVehiculos/{{idTurno}}/impresiones/ultima
+Authorization: Bearer {{token}}

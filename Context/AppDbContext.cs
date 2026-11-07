@@ -27,6 +27,11 @@
         public DbSet<AsistenciaOperario> AsistenciaOperario { get; set; }
         public DbSet<WhatsAppNotification> WhatsAppNotifications { get; set; }
         public DbSet<EmailNotification> EmailNotifications { get; set; }
+        public DbSet<ComprobanteRetiro> ComprobantesRetiro { get; set; }
+        public DbSet<ImpresionComprobante> ImpresionesComprobante { get; set; }
+        public DbSet<Empresa> Empresas { get; set; }
+        public DbSet<ConfiguracionFacturacion> ConfiguracionFacturacion { get; set; }
+        public DbSet<Factura> Facturas { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -55,12 +60,21 @@
             }
 
             modelBuilder.Entity<FormaPago>().ToTable("FormaPago");
+            modelBuilder.Entity<Empresa>().ToTable("Empresa", table => table.HasCheckConstraint("CK_Empresa_Unica", "Id = 1"));
+            modelBuilder.Entity<ConfiguracionFacturacion>().ToTable("ConfiguracionFacturacion",
+                table => table.HasCheckConstraint("CK_Facturacion_Unica", "Id = 1"));
+            modelBuilder.Entity<Factura>().HasIndex(invoice => invoice.IdTurno).IsUnique();
+            modelBuilder.Entity<Factura>().HasIndex(invoice => new { invoice.Prefijo, invoice.Numero }).IsUnique();
             modelBuilder.Entity<WhatsAppNotification>()
                 .HasIndex(notification => notification.IdTurno)
                 .IsUnique();
             modelBuilder.Entity<EmailNotification>()
                 .HasIndex(notification => notification.IdTurno)
                 .IsUnique();
+            modelBuilder.Entity<ComprobanteRetiro>()
+                .HasIndex(receipt => receipt.Codigo)
+                .IsUnique();
+            modelBuilder.Entity<ImpresionComprobante>().HasIndex(job => new { job.IdTurno, job.CreadoEn });
 
             base.OnModelCreating(modelBuilder);
         }
