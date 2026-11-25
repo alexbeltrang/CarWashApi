@@ -27,12 +27,25 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
             var query = Filtered(request.Criterios);
             await ValidateKeysAsync(query, cancellationToken);
             var count = await query.LongCountAsync(cancellationToken);
-            var total = await query.Select(row => (decimal?)row.Amount).SumAsync(cancellationToken) ?? 0m;
-            var groups = await query.GroupBy(row => row.PaymentMethodId)
-                .Select(group => new { Id = group.Key, Name = group.Max(row => row.PaymentMethod), Count = group.Count(), Total = group.Sum(row => (decimal?)row.Amount) })
-                .ToListAsync(cancellationToken);
-            var summary = groups.OrderBy(row => row.Name, StringComparer.CurrentCultureIgnoreCase)
-                .Select(row => new ReporteVentasResumenDto(row.Id, NameOrNull(row.Name), row.Count, (row.Total ?? 0m).ToString(CultureInfo.InvariantCulture))).ToArray();
+            var total = 0m;
+            var groups = new Dictionary<int, (string? Name, long Count, decimal Total)>();
+            var lastIdentifier = 0;
+            while (true)
+            {
+                var batch = await query.Where(row => row.Id > lastIdentifier).OrderBy(row => row.Id)
+                    .Select(row => new { row.Id, row.PaymentMethodId, row.PaymentMethod, row.Amount })
+                    .Take(512).ToListAsync(cancellationToken);
+                foreach (var row in batch)
+                {
+                    total = AddExact(total, row.Amount);
+                    groups.TryGetValue(row.PaymentMethodId, out var group);
+                    groups[row.PaymentMethodId] = (row.PaymentMethod, checked(group.Count + 1), AddExact(group.Total, row.Amount));
+                }
+                if (batch.Count < 512) break;
+                lastIdentifier = batch[^1].Id;
+            }
+            var summary = groups.OrderBy(row => row.Value.Name, StringComparer.CurrentCultureIgnoreCase)
+                .Select(row => new ReporteVentasResumenDto(row.Key, NameOrNull(row.Value.Name), row.Value.Count, row.Value.Total.ToString(CultureInfo.InvariantCulture))).ToArray();
             if (cursor != null)
                 query = query.Where(row => row.Date < cursor.Date || (row.Date == cursor.Date && row.Id < cursor.Id));
             var rows = await query.OrderByDescending(row => row.Date).ThenByDescending(row => row.Id)
@@ -76,6 +89,24 @@ public sealed class ReporteVentasService(AppDbContext database, TimeProvider clo
                 vehicles.Select(row => new ReporteFiltroDto(row.Id, NameOrNull(row.Name))).ToArray());
         }
         finally { await database.Database.CloseConnectionAsync(); }
+    }
+
+    private static decimal AddExact(decimal left, decimal right)
+    {
+        var result = checked(left + right);
+        if (Units(left) + Units(right) != Units(result))
+            throw new OverflowException("Report total cannot be represented exactly as decimal.");
+        return result;
+
+        static System.Numerics.BigInteger Units(decimal value)
+        {
+            var bits = decimal.GetBits(value);
+            var coefficient = new System.Numerics.BigInteger((uint)bits[0])
+                | (new System.Numerics.BigInteger((uint)bits[1]) << 32)
+                | (new System.Numerics.BigInteger((uint)bits[2]) << 64);
+            var scale = (bits[3] >> 16) & 0xff;
+            return (bits[3] < 0 ? -coefficient : coefficient) * System.Numerics.BigInteger.Pow(10, 28 - scale);
+        }
     }
 
     private static string? NameOrNull(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

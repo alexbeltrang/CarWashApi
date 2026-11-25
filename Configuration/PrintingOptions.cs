@@ -4,4 +4,5 @@ public sealed class PrintingOptions
 {
     public bool Enabled { get; set; }
     public string PrinterName { get; set; } = "";
+    public int PaperWidthMm { get; set; } = 60;
 }

@@ -1,5 +1,36 @@
 # CarWash API
 
+## Impresora predeterminada de Windows
+
+La API usa la impresora predeterminada de Windows del usuario que ejecuta el
+proceso, en el equipo servidor, no la del celular. Printing:Enabled debe ser
+true; Printing:PrinterName se conserva por compatibilidad pero ya no selecciona
+la impresora. La configuracion externa se lee desde
+%ProgramData%\SplashCar\printing.json al iniciar la API.
+
+Cada nueva solicitud de ingreso, recibo o factura guarda el nombre de la
+predeterminada actual. Cambiar la predeterminada no requiere reiniciar la API
+y solo afecta solicitudes nuevas; los trabajos existentes conservan su destino
+y no se reenvian automaticamente. Sin predeterminada valida, la solicitud
+devuelve 503 PRINTER_UNAVAILABLE. La impresion deshabilitada devuelve
+503 PRINT_NOT_CONFIGURED.
+
+Printing:PaperWidthMm limita el papel y el contenido a 60 mm (6 cm) por defecto;
+admite 58, 60 u 80. El ancho fisico es el menor entre el solicitado y ese limite.
+Las solicitudes admiten anchoMm 58, 60 u 80, con 60 por defecto; el ingreso
+automatico usa el ancho configurado. Los clientes que todavia solicitan 80 mm
+imprimen dentro de 60 mm sin actualizar el celular. El campo anchoMm del trabajo
+conserva el ancho solicitado para mantener la idempotencia de los recibos.
+El controlador selecciona papel del ancho efectivo o crea un formato personalizado
+si no existe, con margenes y ajuste de lineas. La impresora debe admitir ese papel;
+configurar tambien el rollo y las guias fisicas. No se cambia la impresora
+predeterminada. Reiniciar la API para aplicar cambios de PaperWidthMm.
+
+El campo impresora de la respuesta informa el destino seleccionado; SUBMITTED
+indica entrega a la cola de Windows, no confirmacion de salida fisica. En IIS
+o servicios de Windows, la predeterminada debe estar disponible para la cuenta
+que ejecuta la API. Seleccionar la termica como predeterminada antes de probar.
+
 ## Reporte de ventas y sesiones temporales
 
 Ventas representa cobros de TurnosMovimientos, incluidos parciales y Credito.

@@ -14,5 +14,7 @@ namespace Carwash.API.Modelos
         public string? Motivo { get; set; }
         public bool? Descontado { get; set; }
         public DateTime? FechaDescuento { get; set; }
+        public int? IdFormaPagoSalida { get; set; }
+        public bool? DesembolsoConfirmado { get; set; }
     }
 }

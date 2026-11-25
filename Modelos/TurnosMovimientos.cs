@@ -12,5 +12,7 @@ namespace Carwash.API.Modelos
         public DateTime FechaMovimiento { get; set; }
         public int IdTurno { get; set; }
         public int IdFormaPago { get; set; }
+        public int? IdCaja { get; set; }
+        public string? Naturaleza { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "cl3OSGEGPsg=",
+  "dgSpecHash": "w9oza/fftKs=",
   "success": true,
   "projectFilePath": "D:\\WorkGitHub\\CarWashApi\\Carwash.API.csproj",
   "expectedPackageFiles": [
@@ -35,10 +35,10 @@
     "C:\\Users\\hbeltran\\.nuget\\packages\\system.drawing.common\\9.0.14\\system.drawing.common.9.0.14.nupkg.sha512",
     "C:\\Users\\hbeltran\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
     "C:\\Users\\hbeltran\\.nuget\\packages\\system.text.json\\9.0.14\\system.text.json.9.0.14.nupkg.sha512",
-    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.22\\microsoft.windowsdesktop.app.ref.9.0.22.nupkg.sha512",
-    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.22\\microsoft.netcore.app.ref.9.0.22.nupkg.sha512",
-    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.22\\microsoft.aspnetcore.app.ref.9.0.22.nupkg.sha512",
-    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\9.0.22\\microsoft.netcore.app.host.win-x64.9.0.22.nupkg.sha512"
+    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.23\\microsoft.windowsdesktop.app.ref.9.0.23.nupkg.sha512",
+    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.23\\microsoft.netcore.app.ref.9.0.23.nupkg.sha512",
+    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.23\\microsoft.aspnetcore.app.ref.9.0.23.nupkg.sha512",
+    "C:\\Users\\hbeltran\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\9.0.23\\microsoft.netcore.app.host.win-x64.9.0.23.nupkg.sha512"
   ],
   "logs": []
 }

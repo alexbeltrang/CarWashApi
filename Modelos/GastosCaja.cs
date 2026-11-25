@@ -13,5 +13,7 @@ namespace Carwash.API.Modelos
         public string? Concepto { get; set; }
         public decimal Valor { get; set; }
         public string Observaciones { get; set; }
+        public int? IdFormaPagoSalida { get; set; }
+        public bool? DesembolsoConfirmado { get; set; }
     }
 }

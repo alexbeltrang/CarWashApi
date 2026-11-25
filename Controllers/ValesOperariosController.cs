@@ -1,5 +1,6 @@
 ﻿using Carwash.API.Context;
 using Carwash.API.Modelos;
+using Carwash.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +53,7 @@ namespace Carwash.API.Controllers
 
 
         [HttpPost("RegistrarValesOperarios")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Create([FromBody] ValesOperarios valeOperario)
         {
 

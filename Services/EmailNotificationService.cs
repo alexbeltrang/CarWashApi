@@ -132,13 +132,25 @@ public sealed class EmailNotificationService(
         EmailBody body,
         CancellationToken cancellationToken)
     {
-        notification.Intentos++;
-        notification.Estado = "RETRYING";
-        var result = await client.SendAsync(
-            recipient,
-            subject,
-            body,
-            cancellationToken);
+        var maximumAttempts = Math.Max(1, options.Value.MaxAttempts);
+        var claimed = await context.EmailNotifications.Where(item => item.Id == notification.Id
+                && item.Intentos < maximumAttempts && (item.Estado == "PENDING" || item.Estado == "RETRYING" || item.Estado == "FAILED")
+                && context.Turnos.Any(turn => turn.IdTurno == item.IdTurno))
+            .ExecuteUpdateAsync(update => update.SetProperty(item => item.Estado, "SENDING")
+                .SetProperty(item => item.Intentos, item => item.Intentos + 1)
+                .SetProperty(item => item.ActualizadoEn, DateTime.UtcNow), cancellationToken);
+        if (claimed == 0) return ToResult(notification);
+        await context.Entry(notification).ReloadAsync(cancellationToken);
+        EmailSendResult result;
+        try { result = await client.SendAsync(recipient, subject, body, cancellationToken); }
+        catch (OperationCanceledException)
+        {
+            notification.Estado = "UNKNOWN";
+            notification.UltimoErrorCodigo = "CANCELLED";
+            notification.ProximoIntentoEn = null;
+            await context.SaveChangesAsync(CancellationToken.None);
+            throw;
+        }
         notification.UltimoErrorCodigo = result.ErrorCode;
         notification.Estado = result.Accepted
             ? "ACCEPTED"

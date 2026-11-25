@@ -14,6 +14,33 @@ namespace Carwash.API.Controllers
     {
         private readonly AppDbContext _context;
 
+        [HttpPost("{id:int}/correccion")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
+        public async Task<IActionResult> Corregir(int id, CajaCorreccionCobroRequest request, [FromServices] CajaDiariaService caja, CancellationToken token)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await caja.CorregirCobroAsync(User, id, request, token)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpPost("{id:int}/borrado")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
+        public async Task<IActionResult> Borrar(int id, CajaBorradoRequest request, [FromServices] CajaDiariaService caja, CancellationToken token)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await caja.BorrarAsync(User, id, true, request, token)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpGet("{id:int}/impacto")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
+        public async Task<IActionResult> Impacto(int id, [FromServices] CajaDiariaService caja, CancellationToken token)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await caja.ImpactoAsync(User, id, true, token)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
         public TurnosMovimientosController(AppDbContext context)
         {
             _context = context;
@@ -43,6 +70,7 @@ namespace Carwash.API.Controllers
 
         // POST: api/Turnos
         [HttpPost("RegistrarTurnoMovimiento")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Create([FromBody] TurnosMovimientos turnoMovimiento)
         {
             try
@@ -59,6 +87,7 @@ namespace Carwash.API.Controllers
         }
 
         [HttpPut("ActualizarTurnoMovimiento/{id}")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> ActualizarTurnoMovimiento(int id, [FromBody] TurnosMovimientos turnoMovimiento)
         {
             if (id != turnoMovimiento.IdTurnoMovimientos)
@@ -74,6 +103,7 @@ namespace Carwash.API.Controllers
 
         // DELETE: api/turno/5
         [HttpDelete("{id}")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Delete(int id)
         {
             var turno = await _context.TurnosMovimientos.FindAsync(id);

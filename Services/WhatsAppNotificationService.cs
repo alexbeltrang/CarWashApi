@@ -148,6 +148,7 @@ public sealed class WhatsAppNotificationService(
         var maximumAttempts = Math.Max(1, options.Value.MaxAttempts);
         var claimed = await context.WhatsAppNotifications
             .Where(item => item.Id == notification.Id && item.MessageIdExterno == null &&
+                context.Turnos.Any(turn => turn.IdTurno == item.IdTurno) &&
                 item.Intentos < maximumAttempts &&
                 (item.Estado == "PENDING" || item.Estado == "RETRYING" || item.Estado == "FAILED"))
             .ExecuteUpdateAsync(setters => setters

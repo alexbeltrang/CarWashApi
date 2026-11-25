@@ -8,7 +8,7 @@ POST {{baseUrl}}/api/RetiroVehiculos/{{idTurno}}/impresiones
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
-{"solicitudId":"{{solicitudId}}","anchoMm":80}
+{"solicitudId":"{{solicitudId}}","anchoMm":60}
 
 ### Consultar la misma solicitud sin imprimir de nuevo.
 GET {{baseUrl}}/api/RetiroVehiculos/impresiones/{{solicitudId}}

@@ -32,6 +32,10 @@
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<ConfiguracionFacturacion> ConfiguracionFacturacion { get; set; }
         public DbSet<Factura> Facturas { get; set; }
+        public DbSet<CajaControl> CajaControl { get; set; }
+        public DbSet<CajaCierre> CajaCierres { get; set; }
+        public DbSet<CajaAuditoria> CajaAuditoria { get; set; }
+        public DbSet<CajaOperacion> CajaOperaciones { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -40,6 +44,24 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var decimalTextConverter = new ValueConverter<decimal, string>(
+                value => DecimalText.Format(value), text => DecimalText.Parse(text));
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.MontoInicial).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalIngresosEfectivo).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalIngresosTransferencias).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalIngresosDatafono).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalIngresosCredito).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalEgresos).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalValesOperarios).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<CajaDiaria>().Property(row => row.TotalFinal).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<Turnos>().Property(row => row.Valor).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<Turnos>().Property(row => row.ValorBaseComision).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<Turnos>().Property(row => row.PorcentajeComision).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<Turnos>().Property(row => row.ValorComision).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<TurnosMovimientos>().Property(row => row.MontoPagado).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<GastosCaja>().Property(row => row.Valor).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+            modelBuilder.Entity<ValesOperarios>().Property(row => row.Valor).HasConversion(decimalTextConverter).HasColumnType("TEXT");
+
             var dateTimeConverter = new ValueConverter<DateTime, string>(
                 v => v.ToString("yyyy-MM-dd HH:mm:ss.fff"),
                 v => DateTime.Parse(v));
@@ -76,7 +98,87 @@
                 .IsUnique();
             modelBuilder.Entity<ImpresionComprobante>().HasIndex(job => new { job.IdTurno, job.CreadoEn });
 
+            modelBuilder.Entity<CajaControl>(entity =>
+            {
+                entity.ToTable("CajaControl", table => table.HasCheckConstraint("CK_CajaControl_Revision", "Revision >= 0"));
+                entity.Property(row => row.IdCaja).ValueGeneratedNever();
+                entity.Property(row => row.Revision).IsConcurrencyToken();
+                entity.HasOne<CajaDiaria>().WithOne().HasForeignKey<CajaControl>(row => row.IdCaja).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<CajaCierre>().WithMany().HasForeignKey(row => row.IdCierreVigente).OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<CajaCierre>(entity =>
+            {
+                entity.ToTable("CajaCierres", table => table.HasCheckConstraint("CK_CajaCierres_Version", "Version >= 1 AND SnapshotVersion >= 1"));
+                entity.HasIndex(row => new { row.IdCaja, row.Version }).IsUnique();
+                entity.HasOne<CajaDiaria>().WithMany().HasForeignKey(row => row.IdCaja).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<CajaCierre>().WithMany().HasForeignKey(row => row.IdCierreAnterior).OnDelete(DeleteBehavior.Restrict);
+                entity.Property(row => row.EfectivoContado).HasConversion<string>();
+                entity.Property(row => row.Diferencia).HasConversion<string>();
+            });
+            modelBuilder.Entity<CajaOperacion>().ToTable("CajaOperaciones");
+            modelBuilder.Entity<CajaAuditoria>(entity =>
+            {
+                entity.ToTable("CajaAuditoria");
+                entity.HasIndex(row => row.IdOperacion).IsUnique();
+                entity.HasIndex(row => new { row.IdsCajaAfectadasJson, row.FechaUtc });
+                entity.HasOne<CajaOperacion>().WithOne().HasForeignKey<CajaAuditoria>(row => row.IdOperacion).OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<TurnosMovimientos>().HasIndex(row => new { row.IdCaja, row.FechaMovimiento, row.IdTurnoMovimientos });
+            modelBuilder.Entity<TurnosMovimientos>().HasOne<CajaDiaria>().WithMany().HasForeignKey(row => row.IdCaja).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<GastosCaja>().HasIndex(row => row.idCaja);
+            modelBuilder.Entity<ValesOperarios>().HasIndex(row => row.idCaja);
+            modelBuilder.Entity<CajaDiaria>().HasIndex(row => row.Estado).IsUnique().HasFilter("Estado = 1");
+
             base.OnModelCreating(modelBuilder);
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            ValidateCashEvidence();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            ValidateCashEvidence();
+            return SaveWithParentsAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private async Task<int> SaveWithParentsAsync(bool acceptAllChangesOnSuccess, CancellationToken token)
+        {
+            var parents = ChangeTracker.Entries().Where(entry => entry.State is EntityState.Added or EntityState.Modified)
+                .Select(entry => entry.Entity switch
+                {
+                    TurnoServicios row => row.IdTurno,
+                    EmailNotification row => row.IdTurno,
+                    WhatsAppNotification row => row.IdTurno,
+                    ComprobanteRetiro row => row.IdTurno,
+                    ImpresionComprobante row => row.IdTurno,
+                    Factura row => row.IdTurno,
+                    _ => 0
+                }).Where(identifier => identifier != 0).Distinct().ToArray();
+            await using var owned = parents.Length > 0 && Database.CurrentTransaction == null
+                ? await Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, token) : null;
+            foreach (var identifier in parents)
+            {
+                var local = ChangeTracker.Entries<Turnos>().SingleOrDefault(entry => entry.Entity.IdTurno == identifier);
+                if (local?.State == EntityState.Deleted || local?.State != EntityState.Added && !await Turnos.AsNoTracking().AnyAsync(row => row.IdTurno == identifier, token))
+                    throw new DbUpdateException("TURN_NOT_FOUND");
+            }
+            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, token);
+            if (owned != null) await owned.CommitAsync(token);
+            return result;
+        }
+
+        private void ValidateCashEvidence()
+        {
+            ChangeTracker.DetectChanges();
+            if (ChangeTracker.Entries().Any(entry => entry.Entity is Modelos.CajaCierre or Modelos.CajaAuditoria or Modelos.CajaOperacion
+                && entry.State is EntityState.Modified or EntityState.Deleted))
+                throw new InvalidOperationException("CAJA_EVIDENCE_IMMUTABLE");
+            if (ChangeTracker.Entries<CajaControl>().Any(entry => entry.State == EntityState.Modified
+                && entry.Entity.Revision <= entry.OriginalValues.GetValue<long>(nameof(Modelos.CajaControl.Revision))))
+                throw new InvalidOperationException("CAJA_REVISION_REQUIRED");
         }
     }
 }

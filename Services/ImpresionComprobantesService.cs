@@ -39,14 +39,14 @@ public sealed class ImpresionComprobantesService(AppDbContext context, RetiroVeh
         var services = await context.TurnoServicios.Where(item => item.IdTurno == idTurno && !item.IsDeleted)
             .Select(item => item.idServicios).Distinct().ToListAsync(cancellationToken);
         if (!services.ToHashSet().SetEquals(request.IdServicios)) throw new RetiroException(409, "SERVICES_NOT_CONFIRMED");
-        var result = await RequestAsync(idTurno, new(id, 80), userId, cancellationToken);
+        var result = await RequestAsync(idTurno, new(id, 60), userId, cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return result;
     }
 
     public async Task<ImpresionComprobanteDto> RequestAsync(int idTurno, SolicitarImpresionRequest request, int userId, CancellationToken cancellationToken)
     {
-        if (idTurno <= 0 || request.SolicitudId == Guid.Empty || request.AnchoMm is not (58 or 80)) throw new RetiroException(400, "INVALID_PRINT_INPUT");
+        if (idTurno <= 0 || request.SolicitudId == Guid.Empty || request.AnchoMm != 60) throw new RetiroException(400, "INVALID_PRINT_INPUT");
         var key = request.SolicitudId.ToString("D");
         var existing = await context.ImpresionesComprobante.AsNoTracking().SingleOrDefaultAsync(job => job.SolicitudId == key, cancellationToken);
         if (existing is not null)
@@ -54,8 +54,7 @@ public sealed class ImpresionComprobantesService(AppDbContext context, RetiroVeh
             if (existing.IdTurno != idTurno || existing.AnchoMm != request.AnchoMm || ReceiptPrintLayout.IsInvoice(existing.Texto)) throw new RetiroException(409, "PRINT_REQUEST_CONFLICT");
             return Map(existing);
         }
-        if (request.AnchoMm != 80) throw new RetiroException(400, "INVALID_PRINT_INPUT");
-        if (!options.Value.Enabled || string.IsNullOrWhiteSpace(options.Value.PrinterName)) throw new RetiroException(503, "PRINT_NOT_CONFIGURED");
+        if (!options.Value.Enabled) throw new RetiroException(503, "PRINT_NOT_CONFIGURED");
         var receipt = (await receipts.IssueAsync(new EmitirComprobanteRequest(IdTurno: idTurno), cancellationToken)).Receipt;
         var text = ReceiptPrintLayout.Snapshot(receipt, await new EmpresaService(context).GetAsync(cancellationToken));
         return await EnqueueAsync(idTurno, request, userId, text, null, cancellationToken);
@@ -63,16 +62,16 @@ public sealed class ImpresionComprobantesService(AppDbContext context, RetiroVeh
 
     public async Task<ImpresionComprobanteDto> InvoiceAsync(FacturaDto invoice, SolicitarImpresionRequest request, int userId, CancellationToken cancellationToken)
     {
-        if (request.SolicitudId == Guid.Empty || request.AnchoMm != 80) throw new RetiroException(400, "INVALID_PRINT_INPUT");
+        if (request.SolicitudId == Guid.Empty || request.AnchoMm != 60) throw new RetiroException(400, "INVALID_PRINT_INPUT");
         var key = request.SolicitudId.ToString("D");
         var existing = await context.ImpresionesComprobante.AsNoTracking().SingleOrDefaultAsync(job => job.SolicitudId == key, cancellationToken);
         if (existing is not null)
         {
-            if (!ReceiptPrintLayout.IsInvoice(existing.Texto) || ReceiptPrintLayout.ReadSnapshot(existing.Texto).DocumentId != invoice.Id.ToString("D"))
+            if (existing.AnchoMm != request.AnchoMm || !ReceiptPrintLayout.IsInvoice(existing.Texto) || ReceiptPrintLayout.ReadSnapshot(existing.Texto).DocumentId != invoice.Id.ToString("D"))
                 throw new RetiroException(409, "PRINT_REQUEST_CONFLICT");
             return Map(existing);
         }
-        if (!options.Value.Enabled || string.IsNullOrWhiteSpace(options.Value.PrinterName)) throw new RetiroException(503, "PRINT_NOT_CONFIGURED");
+        if (!options.Value.Enabled) throw new RetiroException(503, "PRINT_NOT_CONFIGURED");
         return await EnqueueAsync(invoice.IdTurno, request, userId, ReceiptPrintLayout.Snapshot(invoice), invoice.Id.ToString("D"), cancellationToken);
     }
 
@@ -81,13 +80,17 @@ public sealed class ImpresionComprobantesService(AppDbContext context, RetiroVeh
     {
         var key = request.SolicitudId.ToString("D");
         var now = clock.GetUtcNow().UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
-        var printerName = options.Value.PrinterName;
+        string printerName;
+        try { printerName = printer.GetDefaultPrinterName(); }
+        catch (PrinterUnavailableException) { throw new RetiroException(503, "PRINTER_UNAVAILABLE"); }
         await context.Database.ExecuteSqlInterpolatedAsync($"""
             INSERT INTO ImpresionesComprobante (SolicitudId, IdTurno, AnchoMm, SolicitadoPor, Impresora, Estado, Texto, CreadoEn, ActualizadoEn)
-            VALUES ({key}, {idTurno}, {request.AnchoMm}, {userId}, {printerName}, 'PENDING', {text}, {now}, {now})
+            SELECT {key}, {idTurno}, {request.AnchoMm}, {userId}, {printerName}, 'PENDING', {text}, {now}, {now}
+            WHERE EXISTS (SELECT 1 FROM Turnos WHERE IdTurno={idTurno})
             ON CONFLICT(SolicitudId) DO NOTHING
             """, cancellationToken);
-        var result = await context.ImpresionesComprobante.AsNoTracking().SingleAsync(job => job.SolicitudId == key, cancellationToken);
+        var result = await context.ImpresionesComprobante.AsNoTracking().SingleOrDefaultAsync(job => job.SolicitudId == key, cancellationToken)
+            ?? throw new RetiroException(404, "TURN_NOT_FOUND");
         if (result.IdTurno != idTurno || result.AnchoMm != request.AnchoMm || ReceiptPrintLayout.ReadSnapshot(result.Texto).DocumentId != documentId)
             throw new RetiroException(409, "PRINT_REQUEST_CONFLICT");
         return Map(result);
@@ -132,7 +135,8 @@ public sealed class ImpresionComprobantesService(AppDbContext context, RetiroVeh
         var key = await context.ImpresionesComprobante.AsNoTracking().Where(job => job.Estado == "PENDING")
             .OrderBy(job => job.CreadoEn).ThenBy(job => job.SolicitudId).Select(job => job.SolicitudId).FirstOrDefaultAsync(cancellationToken);
         if (key is null) return false;
-        var claimed = await context.ImpresionesComprobante.Where(job => job.SolicitudId == key && job.Estado == "PENDING")
+        var claimed = await context.ImpresionesComprobante.Where(job => job.SolicitudId == key && job.Estado == "PENDING"
+            && context.Turnos.Any(turn => turn.IdTurno == job.IdTurno))
             .ExecuteUpdateAsync(setters => setters.SetProperty(job => job.Estado, "SUBMITTING")
                 .SetProperty(job => job.ActualizadoEn, clock.GetUtcNow().UtcDateTime), cancellationToken);
         if (claimed == 0) return false;

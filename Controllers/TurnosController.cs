@@ -4,6 +4,8 @@ using Carwash.API.Modelos;
 using Carwash.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 
 namespace Carwash.API.Controllers
 {
@@ -12,10 +14,65 @@ namespace Carwash.API.Controllers
     public class TurnosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly CajaDiariaService _caja;
 
-        public TurnosController(AppDbContext context)
+        [HttpGet("{id:int}/impacto-borrado")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
+        public async Task<IActionResult> ImpactoBorrado(int id, CancellationToken token)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await _caja.ImpactoAsync(User, id, false, token)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpPost("{id:int}/borrado")]
+        [Authorize(Policy = AdministradorAuthorizationHandler.PolicyName)]
+        public async Task<IActionResult> Borrado(int id, CajaBorradoRequest request, CancellationToken token)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await _caja.BorrarAsync(User, id, false, request, token)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpGet("{id:int}/saldo")]
+        [Authorize]
+        public async Task<IActionResult> Saldo(int id, CancellationToken cancellationToken)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try { return Ok(await _caja.SaldoAsync(User, id, cancellationToken)); }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpPost("{id:int}/operario")]
+        [Authorize]
+        public async Task<IActionResult> Operario(int id, CajaOperarioRequest request, CancellationToken cancellationToken)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try
+            {
+                var result = await _caja.OperarioAsync(User, id, request, cancellationToken);
+                return Created($"/api/CajaDiaria/operaciones/{result.IdOperacion}", result);
+            }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        [HttpPost("{id:int}/cobros")]
+        [Authorize]
+        public async Task<IActionResult> Cobro(int id, CajaCobroRequest request, CancellationToken cancellationToken)
+        {
+            Response.Headers.CacheControl = "no-store";
+            try
+            {
+                var result = await _caja.CobrarAsync(User, id, request, cancellationToken);
+                return Created($"/api/CajaDiaria/operaciones/{result.IdOperacion}", result);
+            }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
+        }
+
+        public TurnosController(AppDbContext context, CajaDiariaService caja)
         {
             _context = context;
+            _caja = caja;
         }
         // GET: api/CajaDiaria
         [HttpGet]
@@ -58,73 +115,33 @@ namespace Carwash.API.Controllers
 
         // POST: api/Turnos
         [HttpPost("RegistrarTurno")]
-        public async Task<IActionResult> Create([FromBody] Turnos turno)
+        [Authorize]
+        public async Task<IActionResult> Create([FromBody] Turnos turno, CancellationToken cancellationToken)
         {
-
-            _context.Turnos.Add(turno);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetById), new { id = turno.IdTurno }, turno);
+            try
+            {
+                await _caja.RegistrarTurnoAsync(User, turno, cancellationToken);
+                return CreatedAtAction(nameof(GetById), new { id = turno.IdTurno }, turno);
+            }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
         }
 
         // PUT: api/Turnos/5
         [HttpPut("ActualizarTurno/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Turnos turno)
+        [Authorize]
+        public async Task<IActionResult> Update(int id, [FromBody] JsonElement turno, CancellationToken cancellationToken)
         {
-            if (id != turno.IdTurno)
-                return BadRequest();
-
-            var actual = await _context.Turnos.FindAsync(id);
-            if (actual == null)
-                return NotFound();
-
-            // Solo fusiona: un valor vacio o por defecto nunca borra un dato ya guardado.
-            static string? Texto(string? nuevo, string? actual) => string.IsNullOrWhiteSpace(nuevo) ? actual : nuevo;
-            static DateTime? Fecha(DateTime? nuevo, DateTime? actual) =>
-                nuevo.HasValue && nuevo.Value.Year > 1 ? nuevo : actual;
-            static decimal Monto(decimal nuevo, decimal actual) => nuevo != 0 ? nuevo : actual;
-            static int? Ref(int? nuevo, int? actual) => nuevo.HasValue && nuevo.Value > 0 ? nuevo : actual;
-
-            actual.NumeroTurno = Texto(turno.NumeroTurno, actual.NumeroTurno);
-            actual.NombreCliente = Texto(turno.NombreCliente, actual.NombreCliente);
-            actual.NumeroCelular = Texto(turno.NumeroCelular, actual.NumeroCelular);
-            actual.CorreoElectronico = Texto(turno.CorreoElectronico, actual.CorreoElectronico);
-            actual.Placa = Texto(turno.Placa, actual.Placa)!;
-            actual.Marca = Texto(turno.Marca, actual.Marca);
-            actual.NumeroOrden = Texto(turno.NumeroOrden, actual.NumeroOrden);
-            actual.Observaciones = Texto(turno.Observaciones, actual.Observaciones);
-
-            // La fecha de ingreso nunca se modifica una vez registrada.
-            if (actual.FechaHoraIngreso.Year <= 1)
-                actual.FechaHoraIngreso = turno.FechaHoraIngreso;
-            actual.FechaHoraFin = Fecha(turno.FechaHoraFin, actual.FechaHoraFin);
-            actual.FechaHoraAsignacionOperario = Fecha(turno.FechaHoraAsignacionOperario, actual.FechaHoraAsignacionOperario);
-
-            actual.Valor = Monto(turno.Valor, actual.Valor);
-            actual.ValorBaseComision = Monto(turno.ValorBaseComision, actual.ValorBaseComision);
-            actual.PorcentajeComision = Monto(turno.PorcentajeComision, actual.PorcentajeComision);
-            actual.ValorComision = Monto(turno.ValorComision, actual.ValorComision);
-
-            actual.idOperario = Ref(turno.idOperario, actual.idOperario);
-            actual.idCajaDiaria = Ref(turno.idCajaDiaria, actual.idCajaDiaria);
-            actual.idClienteCredito = Ref(turno.idClienteCredito, actual.idClienteCredito);
-            if (turno.IdTipoVehiculo > 0)
-                actual.IdTipoVehiculo = turno.IdTipoVehiculo;
-
-            // Las banderas de cierre solo avanzan; nunca se revierten.
-            actual.Pagado |= turno.Pagado;
-            actual.Estado |= turno.Estado;
-            actual.PagadoNomina |= turno.PagadoNomina;
-            if (turno.OperadorOcupado.HasValue)
-                actual.OperadorOcupado = turno.OperadorOcupado;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                await _caja.ActualizarDatosTurnoAsync(User, id, turno, cancellationToken);
+                return NoContent();
+            }
+            catch (CajaException error) { return CajaHttp.Error(HttpContext, error.Status, error.Code, error.Errors); }
         }
 
         // DELETE: api/turno/5
         [HttpDelete("{id}")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Delete(int id)
         {
             var turno = await _context.Turnos.FindAsync(id);
@@ -215,6 +232,7 @@ namespace Carwash.API.Controllers
         }
 
         [HttpPut("{id:int}/Operario")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> AsignarOperario(int id, [FromBody] AsignarOperarioRequest request)
         {
             if (request == null || request.IdOperario <= 0 || request.IdUsuario <= 0)
@@ -266,6 +284,7 @@ namespace Carwash.API.Controllers
         }
 
         [HttpPut("{id:int}/EnProceso")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> ActualizarEnProceso(int id, [FromBody] ActualizarTurnoEnProcesoRequest request)
         {
             var servicios = request.IdServicios.Distinct().ToList();

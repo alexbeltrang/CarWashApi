@@ -1,5 +1,6 @@
 ﻿using Carwash.API.Context;
 using Carwash.API.Modelos;
+using Carwash.API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ namespace Carwash.API.Controllers
 
         // POST: api/Turnos
         [HttpPost("RegistrarGastoCaja")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Create([FromBody] GastosCaja gasto)
         {
             try
@@ -55,6 +57,7 @@ namespace Carwash.API.Controllers
         }
 
         [HttpPut("ActualizarGastoCaja/{id}")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> ActualizarGastoCaja(int id, [FromBody] GastosCaja gasto)
         {
             if (id != gasto.IdGasto)
@@ -70,6 +73,7 @@ namespace Carwash.API.Controllers
 
         // DELETE: api/turno/5
         [HttpDelete("{id}")]
+        [CajaLegacyWrite]
         public async Task<IActionResult> Delete(int id)
         {
             var gasto = await _context.GastosCaja.FindAsync(id);

@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddJsonFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-    "SplashCar", "printing.json"), optional: true, reloadOnChange: false);
+if (!builder.Environment.IsEnvironment("Testing"))
+    builder.Configuration.AddJsonFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "SplashCar", "printing.json"), optional: true, reloadOnChange: false);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
 builder.Services.AddControllers();
@@ -42,7 +43,7 @@ builder.Services.AddScoped<EmpresaService>();
 builder.Services.AddScoped<FacturacionService>();
 builder.Services.AddScoped<IFacturacionService>(services => services.GetRequiredService<FacturacionService>());
 builder.Services.AddOptions<PrintingOptions>().Bind(builder.Configuration.GetSection("Printing"))
-    .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.PrinterName) && options.PrinterName.Length <= 256)
+    .Validate(options => options.PaperWidthMm is 58 or 60 or 80)
     .ValidateOnStart();
 if (OperatingSystem.IsWindows()) builder.Services.AddSingleton<IReceiptPrinter, WindowsReceiptPrinter>();
 else builder.Services.AddSingleton<IReceiptPrinter, UnavailableReceiptPrinter>();
@@ -51,6 +52,8 @@ builder.Services.AddScoped<IImpresionComprobantesService>(services => services.G
 builder.Services.AddHostedService<ReceiptPrintWorker>();
 builder.Services.AddScoped<IEmailClient, SmtpEmailClient>();
 builder.Services.AddScoped<ReporteVentasService>();
+builder.Services.AddScoped<CajaSchemaInitializer>();
+builder.Services.AddScoped<CajaDiariaService>();
 
 // SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -153,6 +156,9 @@ using (var scope = app.Services.CreateScope())
     if (!hasEmailColumn)
         db.Database.ExecuteSqlRaw("ALTER TABLE Turnos ADD COLUMN CorreoElectronico TEXT NULL");
     db.Database.CloseConnection();
+    var cajaDiagnostics = await scope.ServiceProvider.GetRequiredService<CajaSchemaInitializer>().InitializeAsync();
+    foreach (var diagnostic in cajaDiagnostics)
+        app.Logger.LogWarning("Caja schema diagnostic: {Code}", diagnostic);
 }
 
 // Swagger siempre activo para pruebas

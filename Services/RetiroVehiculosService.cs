@@ -21,6 +21,7 @@ public sealed class RetiroVehiculosService(AppDbContext context, TimeProvider cl
         var hasPlate = !string.IsNullOrWhiteSpace(request.Placa);
         if (hasId == hasPlate || hasId && request.IdTurno <= 0 || request.Placa?.Length > 20)
             throw new RetiroException(400, "INVALID_INPUT");
+        await using var transaction = context.Database.CurrentTransaction == null ? await context.Database.BeginTransactionAsync(cancellationToken) : null;
         var plate = request.Placa?.Trim().ToUpperInvariant();
         var query = context.Turnos.AsNoTracking();
         var turn = hasId
@@ -40,7 +41,9 @@ public sealed class RetiroVehiculosService(AppDbContext context, TimeProvider cl
             VALUES ({turn.IdTurno}, {code}, {created})
             ON CONFLICT(IdTurno) DO NOTHING
             """, cancellationToken);
-        return (await GetAsync(turn.IdTurno, cancellationToken), changed == 1);
+        var result = await GetAsync(turn.IdTurno, cancellationToken);
+        if (transaction != null) await transaction.CommitAsync(cancellationToken);
+        return (result, changed == 1);
     }
 
     public async Task<ComprobanteRetiroDto> GetAsync(int idTurno, CancellationToken cancellationToken)
@@ -62,6 +65,8 @@ public sealed class RetiroVehiculosService(AppDbContext context, TimeProvider cl
         int userId, CancellationToken cancellationToken)
     {
         if (!request.RevisionConfirmada) throw new RetiroException(400, "REVIEW_REQUIRED");
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        if (!await context.Turnos.AnyAsync(item => item.IdTurno == idTurno, cancellationToken)) throw new RetiroException(404, "TURN_NOT_FOUND");
         var receipt = await context.ComprobantesRetiro.AsNoTracking()
             .SingleOrDefaultAsync(item => item.IdTurno == idTurno, cancellationToken);
         if (receipt == null) throw new RetiroException(404, "RECEIPT_NOT_FOUND");
@@ -71,7 +76,9 @@ public sealed class RetiroVehiculosService(AppDbContext context, TimeProvider cl
             .ExecuteUpdateAsync(update => update.SetProperty(item => item.EntregadoEn, delivered)
                 .SetProperty(item => item.EntregadoPor, userId), cancellationToken);
         if (changed == 0) throw new RetiroException(409, "ALREADY_DELIVERED");
-        return await GetAsync(idTurno, cancellationToken);
+        var result = await GetAsync(idTurno, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return result;
     }
 
     private async Task<List<ServicioComprobanteDto>> ServicesAsync(int idTurno, int vehicleType,
